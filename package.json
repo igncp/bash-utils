@@ -1,0 +1,45 @@
+{
+  "name": "bash-utils",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Bash Utils Monorepo",
+  "main": "index.js",
+  "scripts": {
+    "build": "lerna run build",
+    "clean": "sh helpers/clean.sh",
+    "lint": "sh helpers/lint.sh",
+    "publish": "sh helpers/publish.sh",
+    "test": "lerna run test"
+  },
+  "author": "Ignacio Carbajo <icarbajop@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "@babel/cli": "^7.1.0",
+    "@babel/core": "^7.1.0",
+    "@babel/plugin-proposal-class-properties": "^7.1.0",
+    "@babel/plugin-proposal-object-rest-spread": "^7.0.0",
+    "@babel/plugin-transform-flow-strip-types": "^7.0.0",
+    "@babel/preset-env": "^7.1.0",
+    "babel-core": "^7.0.0-bridge.0",
+    "babel-eslint": "^9.0.0",
+    "babel-jest": "^23.6.0",
+    "eslint": "^5.6.0",
+    "eslint-plugin-flowtype": "^2.50.1",
+    "eslint-plugin-import": "^2.14.0",
+    "flow-bin": "^0.81.0",
+    "husky": "^1.0.0-rc.14",
+    "jest": "^23.6.0",
+    "lerna": "^3.4.0",
+    "prettier": "^1.14.3"
+  },
+  "husky": {
+    "hooks": {
+      "pre-push": "sh helpers/gitHooks/prepush.sh"
+    }
+  },
+  "prettier": {
+    "semi": false,
+    "singleQuote": true,
+    "trailingComma": "es5"
+  }
+}
