@@ -34,14 +34,13 @@ class Parser extends ChevParser {
     this.CONSUME1(IDENTIFIER)
 
     this.OR([
+      { ALT: () => this.SUBRULE(this.Redirection) },
       {
         ALT: () =>
           this.MANY(() => {
             this.CONSUME2(IDENTIFIER)
-            this.SUBRULE(this.Redirection)
           }),
       },
-      { ALT: () => this.SUBRULE(this.Redirection) },
     ])
   })
 

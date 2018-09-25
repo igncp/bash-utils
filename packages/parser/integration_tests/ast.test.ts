@@ -198,65 +198,6 @@ describe('ast integration tests', () => {
         name: 'Script',
       })
     })
-
-    test('comand with simple forward redirection', () => {
-      expect(buildASTFromSouce('echo foo > bar')).toEqual({
-        children: {
-          Command: [
-            {
-              children: {
-                IDENTIFIER: [
-                  {
-                    image: 'echo',
-                    startColumn: 1,
-                    startLine: 1,
-                    startOffset: 0,
-                    tokenType: tokens.IDENTIFIER,
-                    tokenTypeIdx: expect.any(Number),
-                  },
-                ],
-              },
-              name: 'Command',
-            },
-            {
-              children: {
-                IDENTIFIER: [
-                  {
-                    image: 'printf',
-                    startColumn: 8,
-                    startLine: 1,
-                    startOffset: 7,
-                    tokenType: tokens.IDENTIFIER,
-                    tokenTypeIdx: expect.any(Number),
-                  },
-                ],
-              },
-              name: 'Command',
-            },
-          ],
-          EOF: EOFChild,
-          SEMICOLON: [
-            {
-              image: ';',
-              startColumn: 6,
-              startLine: 1,
-              startOffset: 5,
-              tokenType: tokens.SEMICOLON,
-              tokenTypeIdx: expect.any(Number),
-            },
-            {
-              image: ';',
-              startColumn: 17,
-              startLine: 1,
-              startOffset: 16,
-              tokenType: tokens.SEMICOLON,
-              tokenTypeIdx: expect.any(Number),
-            },
-          ],
-        },
-        name: 'Script',
-      })
-    })
   })
 
   describe('multi-line', () => {
