@@ -1,47 +1,61 @@
-const { name, version } = require('../package.json')
+// @flow
 
-const warnings = []
-const errors = []
+import { buildESTreeAstFromSource } from '@bash-utils/parser'
 
-const allRules = [...warnings, ...errors].sort()
+import { version, name } from '../package.json'
 
-const ast = () => {}
+import * as rules from './rules'
 
-const visitorKeys = () => {}
-
-const rules = allRules.reduce((acc, rule) => {
-  acc[rule] = require(`./rules/${rule}`)
-
-  return acc
+const allRulesEnabled = Object.keys(rules).reduce((acc, ruleKey) => {
+  return {
+    ...acc,
+    [`bashutils/${ruleKey}`]: 2,
+  }
 }, {})
 
-const addRule = (level = 'warn', mapped) => {
-  return rule => {
-    mapped[`bashutils/${rule}`] = level
-  }
+const FAKE_AST = {
+  tokens: [],
+  comments: [],
+  loc: [],
+  range: [],
 }
 
-const ruleConfig = [warnings, errors].reduce((acc, rulesOfType) => {
-  rulesOfType.forEach(addRule('warn', acc))
+const FAKE_VISITOR_KEYS = {
+  Program: ['body'],
+}
 
-  return acc
-}, {})
+const parseForESLint = (code: string) => {
+  const value = buildESTreeAstFromSource(code)
 
-const parseForESLint = code => {
   return {
-    ast: ast(code),
+    ast: {
+      ...FAKE_AST,
+      ...value,
+    },
     code,
-    scopeManager: null,
+    scopeManager: {
+      getDeclaredVariables: () => [],
+      scopes: [
+        {
+          through: [],
+        },
+      ],
+    },
     services: {},
-    visitorKeys,
+    visitorKeys: FAKE_VISITOR_KEYS,
   }
 }
 
 const configs = {
   recommended: {
+    env: {
+      builtin: false,
+      node: false,
+    },
+    globals: {},
     parser: name,
     plugins: ['bashutils'],
-    rules: ruleConfig,
+    rules: allRulesEnabled,
   },
 }
 

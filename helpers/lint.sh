@@ -2,12 +2,9 @@
 
 set -e
 
-PRETTIER_FILES=$(git ls-tree --full-tree -r HEAD |
-  grep -E '([tj]s|json)$' |
-  grep -v 'package-lock.json' |
-  awk '{print $NF}' | tr '\n' ' ')
+PRETTIER_FILES=$(sh helpers/get_prettier_files.sh)
 
-eval "./node_modules/.bin/prettier --write $PRETTIER_FILES"
+eval "./node_modules/.bin/prettier --list-different $PRETTIER_FILES"
 
 ./node_modules/.bin/eslint .
 

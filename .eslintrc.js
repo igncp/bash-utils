@@ -241,7 +241,7 @@ module.exports = {
 
     'import/default': ERROR,
     'import/export': ERROR,
-    'import/extensions': [ERROR, 'never'],
+    'import/extensions': [ERROR, 'never', { json: 'always' }],
     'import/first': ERROR,
     'import/imports-first': ERROR,
     'import/named': ERROR,

@@ -3,7 +3,8 @@
   "linterOptions": {},
   "rules": {
     "indent": [true, "spaces", 2],
-    "interface-name": [true, "never-prefix"],
+    "interface-name": [true, "always-prefix"],
+    "object-literal-key-quotes": [true, "as-needed"],
     "semicolon": [true, "never"]
   }
 }

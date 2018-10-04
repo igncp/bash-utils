@@ -1,6 +1,6 @@
 import { EOF } from 'chevrotain'
 
-import { buildASTFromSouce, tokens } from '../src'
+import { parse, tokens } from '../src'
 
 const EOFChild = [
   {
@@ -16,10 +16,12 @@ const EOFChild = [
   },
 ]
 
-describe('ast integration tests', () => {
+const parseAndGetValue = t => parse(t).value
+
+describe('cst generated', () => {
   describe('one liners', () => {
     test('empty string', () => {
-      expect(buildASTFromSouce('')).toEqual({
+      expect(parseAndGetValue('')).toEqual({
         children: {
           EOF: EOFChild,
         },
@@ -28,7 +30,7 @@ describe('ast integration tests', () => {
     })
 
     test('string of 4 spaces', () => {
-      expect(buildASTFromSouce([0, 0, 0, 0].reduce(a => `${a} `, ''))).toEqual({
+      expect(parseAndGetValue([0, 0, 0, 0].reduce(a => `${a} `, ''))).toEqual({
         children: {
           EOF: EOFChild,
         },
@@ -37,7 +39,7 @@ describe('ast integration tests', () => {
     })
 
     test('command with single argument', () => {
-      expect(buildASTFromSouce('echo world')).toEqual({
+      expect(parseAndGetValue('echo world')).toEqual({
         children: {
           Command: [
             {
@@ -71,7 +73,7 @@ describe('ast integration tests', () => {
     })
 
     test('command with single argument and semicolon', () => {
-      expect(buildASTFromSouce('echo world ;')).toEqual({
+      expect(parseAndGetValue('echo world ;')).toEqual({
         children: {
           Command: [
             {
@@ -115,7 +117,7 @@ describe('ast integration tests', () => {
     })
 
     test('command with no argument', () => {
-      expect(buildASTFromSouce('echo')).toEqual({
+      expect(parseAndGetValue('echo')).toEqual({
         children: {
           Command: [
             {
@@ -141,7 +143,7 @@ describe('ast integration tests', () => {
     })
 
     test('command with two arguments a middle semicolon', () => {
-      expect(buildASTFromSouce('echo ; printf   ;')).toEqual({
+      expect(parseAndGetValue('echo ; printf   ;')).toEqual({
         children: {
           Command: [
             {
@@ -207,7 +209,7 @@ describe('ast integration tests', () => {
       echo bar
       `
 
-      expect(buildASTFromSouce(script)).toEqual({
+      expect(parseAndGetValue(script)).toEqual({
         children: {
           Command: [
             {
@@ -312,10 +314,10 @@ describe('ast integration tests', () => {
   })
 
   it('throws when wrong argument', () => {
-    expect(() => (buildASTFromSouce as any)()).toThrow(
+    expect(() => (parseAndGetValue as any)()).toThrow(
       'You must pass a string as source'
     )
-    expect(() => (buildASTFromSouce as any)(1)).toThrow(
+    expect(() => (parseAndGetValue as any)(1)).toThrow(
       'You must pass a string as source'
     )
   })

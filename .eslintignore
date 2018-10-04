@@ -2,3 +2,4 @@
 node_modules
 lib
 !.babelrc.js
+packages/eslint-plugin-bashutils/tests/integration

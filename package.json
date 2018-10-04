@@ -7,6 +7,7 @@
   "scripts": {
     "build": "lerna run build",
     "clean": "sh helpers/clean.sh",
+    "docs": "lerna run docs",
     "lint": "sh helpers/lint.sh",
     "publish": "sh helpers/publish.sh",
     "test": "lerna run test"
@@ -16,6 +17,7 @@
   "devDependencies": {
     "@babel/cli": "^7.1.0",
     "@babel/core": "^7.1.0",
+    "@babel/node": "^7.0.0",
     "@babel/plugin-proposal-class-properties": "^7.1.0",
     "@babel/plugin-proposal-object-rest-spread": "^7.0.0",
     "@babel/plugin-transform-flow-strip-types": "^7.0.0",
@@ -30,7 +32,8 @@
     "husky": "^1.0.0-rc.14",
     "jest": "^23.6.0",
     "lerna": "^3.4.0",
-    "prettier": "^1.14.3"
+    "prettier": "^1.14.3",
+    "ts-node": "^7.0.1"
   },
   "husky": {
     "hooks": {
