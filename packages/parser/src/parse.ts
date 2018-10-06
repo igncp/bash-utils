@@ -22,7 +22,7 @@ export class Parser extends ChevParser {
       this.OR([
         { ALT: () => this.SUBRULE(this.Command) },
         { ALT: () => this.CONSUME(SEMICOLON) },
-        { ALT: () => this.SUBRULE(this.EmptyStatement) },
+        { ALT: () => this.CONSUME(NEWLINE) },
       ])
     })
 
@@ -46,10 +46,6 @@ export class Parser extends ChevParser {
           }),
       },
     ])
-  })
-
-  protected EmptyStatement = this.RULE('EmptyStatement', () => {
-    this.CONSUME(NEWLINE)
   })
 
   protected Assignment = this.RULE('Assignment', () => {

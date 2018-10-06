@@ -2,9 +2,10 @@
 
 set -e
 
+find helpers/checks -type f | \
+  xargs -I {} sh {}
+
 npm run lint
 npm run test
-
-sh helpers/checks/check_npm_resolver.sh
 
 echo "helpers/gitHooks/prepush.sh completed correctly"

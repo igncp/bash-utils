@@ -6,7 +6,13 @@ import { version, name } from '../package.json'
 
 import * as rules from './rules'
 
-const allRulesEnabled = Object.keys(rules).reduce((acc, ruleKey) => {
+const { experimental: experimentalRules, ...normalRules } = rules
+
+const finalRules = process.env.BASH_UTILS_USE_EXPERIMENTAL_RULES
+  ? { ...normalRules, ...experimentalRules }
+  : normalRules
+
+const allRulesEnabled = Object.keys(finalRules).reduce((acc, ruleKey) => {
   return {
     ...acc,
     [`bashutils/${ruleKey}`]: 2,
@@ -22,6 +28,7 @@ const FAKE_AST = {
 
 const FAKE_VISITOR_KEYS = {
   Program: ['body'],
+  Command: ['children'],
 }
 
 const parseForESLint = (code: string) => {
@@ -59,4 +66,4 @@ const configs = {
   },
 }
 
-export { configs, rules, parseForESLint, version }
+export { configs, finalRules as rules, parseForESLint, version }

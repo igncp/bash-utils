@@ -12,7 +12,7 @@
     "lint": "tslint 'src/**/*.ts' 'integration_tests/**/*.ts'",
     "lint-fix": "npm run lint -- --fix",
     "prepublish": "npm run test && npm run build",
-    "test": "../../node_modules/.bin/jest integration_tests",
+    "test": "sh helpers/test.sh integration_tests",
     "test-watch": "npm run test -- --watch"
   },
   "files": [
@@ -22,7 +22,8 @@
     "access": "public"
   },
   "dependencies": {
-    "chevrotain": "^3.7.4"
+    "chevrotain": "^3.7.4",
+    "lodash": "^4.17.11"
   },
   "devDependencies": {
     "@types/jest": "^23.3.2",

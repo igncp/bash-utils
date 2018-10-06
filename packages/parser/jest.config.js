@@ -14,6 +14,7 @@ module.exports = {
     'ts-jest': {
       tsConfig: path.resolve(path.join(__dirname, 'tsconfig.jest.json')),
       babelConfig: false,
+      diagnostics: false,
     },
   },
 }

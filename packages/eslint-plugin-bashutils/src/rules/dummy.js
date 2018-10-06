@@ -17,8 +17,11 @@ export default {
     }
 
     return {
-      Program() {
-        console.info('Program Visited')
+      Program(...args: any[]) {
+        console.info('Program Visited', args)
+      },
+      Command(...args: any[]) {
+        console.info('Command Visited', args)
       },
     }
   },

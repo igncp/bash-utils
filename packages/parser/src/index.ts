@@ -7,18 +7,16 @@ const buildDummyTreeFromSouce = (source: string) => {
   const { value, parser } = parse(source)
 
   const visitor = getDummyCSTVisitor({ parser })
-  const tree = visitor.visit(value)
 
-  return tree
+  return visitor.visit(value)
 }
 
 const buildESTreeAstFromSource = (source: string) => {
   const { value, parser } = parse(source)
 
   const visitor = getESTreeConverterVisitor({ parser })
-  const tree = visitor.visit(value)
 
-  return tree
+  return visitor.visit(value)
 }
 
 export {

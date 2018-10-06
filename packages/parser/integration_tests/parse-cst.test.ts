@@ -260,51 +260,30 @@ describe('cst generated', () => {
             },
           ],
           EOF: EOFChild,
-          EmptyStatement: [
+          NEWLINE: [
             {
-              children: {
-                NEWLINE: [
-                  {
-                    image: '\n',
-                    startColumn: 1,
-                    startLine: 1,
-                    startOffset: 0,
-                    tokenType: tokens.NEWLINE,
-                    tokenTypeIdx: expect.any(Number),
-                  },
-                ],
-              },
-              name: 'EmptyStatement',
+              image: '\n',
+              startColumn: 1,
+              startLine: 1,
+              startOffset: 0,
+              tokenType: tokens.NEWLINE,
+              tokenTypeIdx: expect.any(Number),
             },
             {
-              children: {
-                NEWLINE: [
-                  {
-                    image: '\n',
-                    startColumn: 15,
-                    startLine: 2,
-                    startOffset: 15,
-                    tokenType: tokens.NEWLINE,
-                    tokenTypeIdx: expect.any(Number),
-                  },
-                ],
-              },
-              name: 'EmptyStatement',
+              image: '\n',
+              startColumn: 15,
+              startLine: 2,
+              startOffset: 15,
+              tokenType: tokens.NEWLINE,
+              tokenTypeIdx: expect.any(Number),
             },
             {
-              children: {
-                NEWLINE: [
-                  {
-                    image: '\n',
-                    startColumn: 15,
-                    startLine: 3,
-                    startOffset: 30,
-                    tokenType: tokens.NEWLINE,
-                    tokenTypeIdx: expect.any(Number),
-                  },
-                ],
-              },
-              name: 'EmptyStatement',
+              image: '\n',
+              startColumn: 15,
+              startLine: 3,
+              startOffset: 30,
+              tokenType: tokens.NEWLINE,
+              tokenTypeIdx: expect.any(Number),
             },
           ],
         },
