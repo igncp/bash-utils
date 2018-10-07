@@ -1,7 +1,7 @@
 {
   "name": "eslint-plugin-bashutils",
   "private": true,
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "ESLint plugin to parse bash files",
   "author": "Ignacio Carbajo <icarbajop@gmail.com>",
   "license": "MIT",
@@ -24,6 +24,6 @@
     "eslint": "^5.6.0"
   },
   "dependencies": {
-    "@bash-utils/parser": "0.0.1"
+    "@bash-utils/parser": "^0.0.2"
   }
 }
