@@ -21,11 +21,14 @@ runTest('no-multiple-empty-lines', rule, {
       code: 'echo foo\necho\necho',
     },
   ].map(ruleTestMapper),
-  invalid: [{
-    code: 'echo foo\n\n\necho bar',
-    errors: [expectedErrorMessage],
-  }, {
-    code: 'echo foo\n\n\necho\n\necho',
-    errors: [expectedErrorMessage, expectedErrorMessage],
-  }].map(ruleTestMapper),
+  invalid: [
+    {
+      code: 'echo foo\n\n\necho bar',
+      errors: [expectedErrorMessage],
+    },
+    {
+      code: 'echo foo\n\n\necho\n\necho',
+      errors: [expectedErrorMessage, expectedErrorMessage],
+    },
+  ].map(ruleTestMapper),
 })

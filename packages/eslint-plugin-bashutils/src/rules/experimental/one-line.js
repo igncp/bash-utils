@@ -12,9 +12,11 @@ export default {
     return {
       Program(node) {
         const tokens = sourceCode.getTokens(node)
-        const newLineTokens = tokens.filter(t => t.type === availableTokens.NEWLINE.tokenName)
+        const newLineTokens = tokens.filter(
+          t => t.type === availableTokens.NEWLINE.tokenName
+        )
 
-        newLineTokens.forEach((t) => {
+        newLineTokens.forEach(t => {
           ctx.report({
             message: 'New line is not allowed',
             node: t,

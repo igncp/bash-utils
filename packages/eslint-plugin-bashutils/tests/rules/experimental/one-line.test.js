@@ -15,11 +15,14 @@ runTest('one-line', rule, {
       code: 'echo foo; echo bar',
     },
   ].map(ruleTestMapper),
-  invalid: [{
-    code: 'echo foo\necho bar',
-    errors: [expectedErrorMessage],
-  }, {
-    code: 'echo foo\necho\necho',
-    errors: [expectedErrorMessage, expectedErrorMessage],
-  }].map(ruleTestMapper),
+  invalid: [
+    {
+      code: 'echo foo\necho bar',
+      errors: [expectedErrorMessage],
+    },
+    {
+      code: 'echo foo\necho\necho',
+      errors: [expectedErrorMessage, expectedErrorMessage],
+    },
+  ].map(ruleTestMapper),
 })

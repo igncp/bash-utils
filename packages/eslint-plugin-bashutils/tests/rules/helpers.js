@@ -25,7 +25,7 @@ export const runTest = (ruleName, rule, tests) => {
   })
 }
 
-export const ruleTestMapper = (opts) => ({
+export const ruleTestMapper = opts => ({
   ...opts,
   parser,
 })
