@@ -287,7 +287,7 @@ module.exports = {
 
   overrides: [
     {
-      files: ['**/*.test.js', '**/helpers/*.js'],
+      files: ['**/*.test.js', '**/helpers/*.js', '**/tests/**'],
       env: {
         jest: true,
       },

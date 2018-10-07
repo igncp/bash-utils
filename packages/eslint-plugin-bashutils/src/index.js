@@ -4,7 +4,8 @@ import { buildESTreeAstFromSource } from '@bash-utils/parser'
 
 import { version, name } from '../package.json'
 
-import * as rules from './rules'
+import rules from './rules'
+import { scopeManager } from './scopeManager'
 
 const { experimental: experimentalRules, ...normalRules } = rules
 
@@ -28,7 +29,7 @@ const FAKE_AST = {
 
 const FAKE_VISITOR_KEYS = {
   Program: ['body'],
-  Command: ['children'],
+  Command: ['body'],
 }
 
 const parseForESLint = (code: string) => {
@@ -40,14 +41,7 @@ const parseForESLint = (code: string) => {
       ...value,
     },
     code,
-    scopeManager: {
-      getDeclaredVariables: () => [],
-      scopes: [
-        {
-          through: [],
-        },
-      ],
-    },
+    scopeManager,
     services: {},
     visitorKeys: FAKE_VISITOR_KEYS,
   }

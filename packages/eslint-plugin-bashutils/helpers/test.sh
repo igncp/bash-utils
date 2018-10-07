@@ -8,6 +8,10 @@ fi
 
 npm run build
 
+echo "running rules tests"
+
+../../node_modules/.bin/jest tests/rules
+
 echo "running integration tests"
 
 ./tests/integration/node_modules/.bin/eslint \

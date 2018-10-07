@@ -1,1 +1,5 @@
-export { default as oneLine } from './oneLine'
+import oneLine from './one-line'
+
+export default {
+  'one-line': oneLine,
+}

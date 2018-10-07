@@ -1,5 +1,17 @@
 import { EOF } from 'chevrotain'
 
+const sortByRange = (a, b) => {
+  if (typeof a.range[0] === 'undefined') {
+    return 1
+  }
+
+  if (typeof b.range[0] === 'undefined') {
+    return -1
+  }
+
+  return a.range[0] - b.range[0]
+}
+
 const parseToken = item => {
   if (item.tokenType === EOF) {
     return {
@@ -69,7 +81,11 @@ const getItemHandler = visitor => item => {
   const isToken = !!item.tokenType
 
   if (isToken) {
-    return parseToken(item)
+    const token = parseToken(item)
+
+    visitor.onTokenFound(token)
+
+    return token
   }
 
   return parseNode(item, visitor)
@@ -98,17 +114,7 @@ const convertASTObjectIntoSortedArray = (ctx, visitor) => {
 
       return acc
     }, [])
-    .sort((a, b) => {
-      if (typeof a.range[0] === 'undefined') {
-        return 1
-      }
-
-      if (typeof b.range[0] === 'undefined') {
-        return -1
-      }
-
-      return a.range[0] - b.range[0]
-    })
+    .sort()
 }
 
 const getNodeParsedProperties = (ctx, visitor) => {
@@ -128,6 +134,12 @@ export const getESTreeConverterVisitor = ({ parser }) => {
       super()
 
       this.validateVisitor()
+
+      this.tokens = []
+    }
+
+    public onTokenFound(token) {
+      this.tokens.push(token)
     }
 
     public Command(ctx) {
@@ -148,12 +160,21 @@ export const getESTreeConverterVisitor = ({ parser }) => {
         ctx,
         this
       )
+      const tokens = this.getProgramTokens()
 
       return {
         body,
+        tokens,
         ...position,
         type: 'Program',
       }
+    }
+
+    private getProgramTokens() {
+      return this.tokens
+        .slice(0)
+        .sort(sortByRange)
+        .filter(t => t.type !== 'EOF')
     }
   }
 

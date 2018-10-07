@@ -40,6 +40,7 @@ export class Parser extends ChevParser {
         ALT: () =>
           this.MANY(() => {
             this.CONSUME2(IDENTIFIER)
+
             this.OPTION(() => {
               this.SUBRULE1(this.Redirection)
             })
@@ -48,10 +49,23 @@ export class Parser extends ChevParser {
     ])
   })
 
+  // @TODO: Fix ambiguities and use this new structure
+  protected SimpleCommand = this.RULE('SimpleCommand', () => {
+    this.OPTION(() => {
+      this.SUBRULE(this.Assignment)
+    })
+    this.OPTION1(() => {
+      this.CONSUME2(IDENTIFIER)
+    })
+    this.OPTION2(() => {
+      this.SUBRULE1(this.Assignment)
+    })
+  })
+
   protected Assignment = this.RULE('Assignment', () => {
-    this.CONSUME1(EOF)
+    this.CONSUME1(IDENTIFIER)
     this.CONSUME2(EQUAL)
-    this.CONSUME3(EOF)
+    this.CONSUME3(IDENTIFIER)
   })
 
   protected WordList = this.RULE('WordList', () => {
@@ -84,6 +98,7 @@ export class Parser extends ChevParser {
 
   constructor(input) {
     super(input, ALL_TOKENS, {
+      // maxLookahead: 0, // tune this to detect and debug bottle-necks
       outputCst: true,
       recoveryEnabled: false,
     })

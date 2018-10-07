@@ -2,5 +2,11 @@
 
 import * as experimental from './experimental'
 
-export { default as dummy } from './dummy'
-export { experimental }
+import dummy from './dummy'
+import noMultipleEmptyLines from './no-multiple-empty-lines'
+
+export default {
+  experimental,
+  dummy,
+  'no-multiple-empty-lines': noMultipleEmptyLines,
+}

@@ -2,9 +2,7 @@
 
 set -e
 
-find helpers/checks -type f | \
-  xargs -I {} sh {}
-
+npm run run-checks
 npm run lint
 npm run test
 

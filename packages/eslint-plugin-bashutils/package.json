@@ -13,7 +13,7 @@
     "access": "public"
   },
   "scripts": {
-    "build": "rm -rf lib; ../../node_modules/.bin/babel --config-file ../../.babelrc -d lib src",
+    "build": "rm -rf lib; ../../node_modules/.bin/babel --config ../../.babelrc.js -d lib src",
     "prepublish": "npm run test && npm run build",
     "test": "sh helpers/test.sh"
   },
@@ -24,6 +24,6 @@
     "eslint": "^5.6.0"
   },
   "dependencies": {
-    "@bash-utils/parser": "file:../parser"
+    "@bash-utils/parser": "0.0.1"
   }
 }

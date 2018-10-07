@@ -1,10 +1,8 @@
 // @flow
 
-const SHOULD_REPORT_DUMMY = false
+import type { T_Context } from '../types'
 
-type T_Context = {|
-  report: mixed => void,
-|}
+const SHOULD_REPORT_DUMMY = false
 
 export default {
   create(ctx: T_Context) {
@@ -17,12 +15,8 @@ export default {
     }
 
     return {
-      Program(...args: any[]) {
-        console.info('Program Visited', args)
-      },
-      Command(...args: any[]) {
-        console.info('Command Visited', args)
-      },
+      Program() {},
+      Command() {},
     }
   },
 }

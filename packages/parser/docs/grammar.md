@@ -4,7 +4,13 @@
 
 Important:
 
-- The following grammar doesn't contain handling of characters like `.` or `/` that build paths
+- This grammar is simplistic and will need to be extended over time
+- It doesn't contain handling of characters like `.` or `/` that build paths
+- It doesn't take into account additional acepted characters like `-`
+
+- Resources:
+- [Reference Manual](https://www.gnu.org/software/bash/manual/bash.html)
+- [POSIX Yacc Grammar](http://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#tag_18_10)
 
 ```
 <letter> ::= a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z|
