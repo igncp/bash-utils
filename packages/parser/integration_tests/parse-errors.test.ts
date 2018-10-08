@@ -1,5 +1,9 @@
 import { parse } from '../src'
 
+const checkThrows = text => {
+  expect(() => (parse as any)(text)).toThrow()
+}
+
 describe('parse errors', () => {
   it('throws when wrong argument', () => {
     expect(() => (parse as any)()).toThrow('You must pass a string as source')
@@ -8,11 +12,16 @@ describe('parse errors', () => {
 
   // @TODO: some of these should not throw but return errors instead
   test('redirections', () => {
-    expect(() => (parse as any)('foo >>')).toThrow()
+    checkThrows('foo >>')
+  })
+
+  test('simple commands', () => {
+    checkThrows('foo=BAR=baz foo')
+    checkThrows('foo==bar foo')
   })
 })
 
-const checkErrors = text => {
+const checkNoErrors = text => {
   const result = parse(text)
 
   expect(result.parseErrors).toHaveLength(0)
@@ -21,19 +30,26 @@ const checkErrors = text => {
 
 describe('non parse errors', () => {
   test('simple commands', () => {
-    checkErrors('foo')
-    checkErrors('foo bar')
-    checkErrors('foo bar baz bam')
+    checkNoErrors('foo')
+    checkNoErrors('foo bar')
+    checkNoErrors('foo bar baz bam')
+    checkNoErrors('foo_bar baz bam')
   })
 
   test('redirections', () => {
-    checkErrors('foo > bar')
-    checkErrors('foo bar > baz')
-    checkErrors('foo > bar baz')
-    checkErrors('foo bar > baz bam')
+    checkNoErrors('foo > bar')
+    checkNoErrors('foo bar > baz')
+    checkNoErrors('foo > bar baz')
+    checkNoErrors('foo bar > baz bam')
 
-    checkErrors('foo >> bar')
-    checkErrors('foo bar >> baz')
-    checkErrors('foo >> baz baz')
+    checkNoErrors('foo >> bar')
+    checkNoErrors('foo bar >> baz')
+    checkNoErrors('foo >> baz baz')
+  })
+
+  test('simple commands', () => {
+    checkNoErrors('FOO=BAR foo > baz')
+    checkNoErrors('FOO=BAR foo bar')
+    checkNoErrors('FOO=BAR FOO2=BAR2 foo bar')
   })
 })

@@ -20,9 +20,9 @@ export class Parser extends ChevParser {
   public Script = this.RULE('Script', () => {
     this.MANY(() => {
       this.OR([
-        { ALT: () => this.SUBRULE(this.Command) },
         { ALT: () => this.CONSUME(SEMICOLON) },
         { ALT: () => this.CONSUME(NEWLINE) },
+        { ALT: () => this.SUBRULE(this.Command) },
       ])
     })
 
@@ -32,33 +32,14 @@ export class Parser extends ChevParser {
   })
 
   protected Command = this.RULE('Command', () => {
-    this.CONSUME1(IDENTIFIER)
-
-    this.OR([
-      { ALT: () => this.SUBRULE(this.Redirection) },
-      {
-        ALT: () =>
-          this.MANY(() => {
-            this.CONSUME2(IDENTIFIER)
-
-            this.OPTION(() => {
-              this.SUBRULE1(this.Redirection)
-            })
-          }),
-      },
-    ])
-  })
-
-  // @TODO: Fix ambiguities and use this new structure
-  protected SimpleCommand = this.RULE('SimpleCommand', () => {
-    this.OPTION(() => {
+    this.MANY(() => {
       this.SUBRULE(this.Assignment)
     })
-    this.OPTION1(() => {
-      this.CONSUME2(IDENTIFIER)
+    this.AT_LEAST_ONE(() => {
+      this.CONSUME1(IDENTIFIER)
     })
-    this.OPTION2(() => {
-      this.SUBRULE1(this.Assignment)
+    this.OPTION(() => {
+      this.SUBRULE(this.Redirection)
     })
   })
 
@@ -69,7 +50,7 @@ export class Parser extends ChevParser {
   })
 
   protected WordList = this.RULE('WordList', () => {
-    this.MANY(() => {
+    this.AT_LEAST_ONE(() => {
       this.CONSUME(IDENTIFIER)
     })
   })

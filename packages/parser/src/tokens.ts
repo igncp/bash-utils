@@ -23,6 +23,32 @@ export const REDIRECTION_FORWARD_DOUBLE = createToken({
 
 export const EQUAL = createToken({ name: 'EQUAL', pattern: '=' })
 
+export const IF = createToken({
+  longer_alt: IDENTIFIER,
+  name: 'IF',
+  pattern: 'if',
+})
+export const FI = createToken({
+  longer_alt: IDENTIFIER,
+  name: 'FI',
+  pattern: 'fi',
+})
+export const THEN = createToken({
+  longer_alt: IDENTIFIER,
+  name: 'THEN',
+  pattern: 'then',
+})
+export const ELSE = createToken({
+  longer_alt: IDENTIFIER,
+  name: 'ELSE',
+  pattern: 'else',
+})
+export const ELIF = createToken({
+  longer_alt: IDENTIFIER,
+  name: 'ELIF',
+  pattern: 'elif',
+})
+
 const WHITESPACE = createToken({
   group: Lexer.SKIPPED,
   name: 'WHITESPACE',
@@ -47,6 +73,11 @@ export const ALL_TOKENS = [
   SEMICOLON,
   REDIRECTION_FORWARD_DOUBLE,
   REDIRECTION_FORWARD_SINGLE,
+  IF,
+  FI,
+  THEN,
+  ELSE,
+  ELIF,
 
   // last
   IDENTIFIER,
