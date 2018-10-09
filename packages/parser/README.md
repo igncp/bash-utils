@@ -1,5 +1,8 @@
 # `@bash-utils/parser`
 
+[![npm version](https://badge.fury.io/js/%40bash-utils%2Fparser.svg)](https://badge.fury.io/js/%40bash-utils%2Fparser)
+[![npm license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/igncp/bash-utils)
+
 ## TODO
 
 - Write Grammar
