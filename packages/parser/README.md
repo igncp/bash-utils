@@ -10,7 +10,7 @@
 ## References
 
 - Chevrotain: https://github.com/SAP/chevrotain
-    - Debugging Ambiguities: https://sap.github.io/chevrotain/docs/FAQ.html#STUCK_AMBIGUITY
+  - Debugging Ambiguities: https://sap.github.io/chevrotain/docs/FAQ.html#STUCK_AMBIGUITY
 - https://github.com/RokuRoad/bright
 - https://github.com/vorpaljs/bash-parser
 - Grammar: https://stackoverflow.com/questions/15598878/posix-sh-ebnf-grammar/15599860#15599860

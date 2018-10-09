@@ -3,10 +3,10 @@
 ## References
 
 - ShellCheck: https://github.com/koalaman/shellcheck
-    - AST: https://github.com/koalaman/shellcheck/blob/master/src/ShellCheck/AST.hs
-    - Parser: https://github.com/koalaman/shellcheck/blob/master/src/ShellCheck/Parser.hs
-    - Keywords, commands, etc.: https://github.com/koalaman/shellcheck/blob/master/src/ShellCheck/Data.hs
-    - Interfaces: https://github.com/koalaman/shellcheck/blob/master/src/ShellCheck/Interface.hs
+  - AST: https://github.com/koalaman/shellcheck/blob/master/src/ShellCheck/AST.hs
+  - Parser: https://github.com/koalaman/shellcheck/blob/master/src/ShellCheck/Parser.hs
+  - Keywords, commands, etc.: https://github.com/koalaman/shellcheck/blob/master/src/ShellCheck/Data.hs
+  - Interfaces: https://github.com/koalaman/shellcheck/blob/master/src/ShellCheck/Interface.hs
 
 ## Filtered tokens-like in AST.hs
 

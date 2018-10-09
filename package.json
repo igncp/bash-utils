@@ -6,6 +6,7 @@
   "main": "index.js",
   "scripts": {
     "build": "lerna run build",
+    "ci": "sh helpers/ci.sh",
     "clean": "sh helpers/clean.sh",
     "docs": "sh helpers/docs.sh",
     "lint": "sh helpers/lint.sh",
