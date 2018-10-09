@@ -54,7 +54,7 @@
   {
     "type": "Rule",
     "name": "MultipleCommand",
-    "orgText": "() => {\n            this.AT_LEAST_ONE(() => {\n                this.OR([\n                    { ALT: () => this.CONSUME(tokens_1.SEMICOLON) },\n                    { ALT: () => this.CONSUME(tokens_1.NEWLINE) },\n                    { ALT: () => this.SUBRULE(this.Command) },\n                    { ALT: () => this.SUBRULE(this.IfExpression) },\n                ]);\n            });\n        }",
+    "orgText": "() => {\n            this.AT_LEAST_ONE(() => {\n                this.OR([\n                    { ALT: () => this.SUBRULE(this.Termination) },\n                    { ALT: () => this.SUBRULE(this.Command) },\n                    { ALT: () => this.SUBRULE(this.IfExpression) },\n                ]);\n            });\n        }",
     "definition": [
       {
         "type": "RepetitionMandatory",
@@ -68,23 +68,9 @@
                 "type": "Flat",
                 "definition": [
                   {
-                    "type": "Terminal",
-                    "name": "SEMICOLON",
-                    "label": "SEMICOLON",
-                    "idx": 0,
-                    "pattern": ";"
-                  }
-                ]
-              },
-              {
-                "type": "Flat",
-                "definition": [
-                  {
-                    "type": "Terminal",
-                    "name": "NEWLINE",
-                    "label": "NEWLINE",
-                    "idx": 0,
-                    "pattern": "\\s*[\\n\\r]+"
+                    "type": "NonTerminal",
+                    "name": "Termination",
+                    "idx": 0
                   }
                 ]
               },
@@ -107,6 +93,87 @@
                     "idx": 0
                   }
                 ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "type": "Rule",
+    "name": "MultipleCommandWithTerminator",
+    "orgText": "() => {\n            this.AT_LEAST_ONE(() => {\n                this.OR([\n                    { ALT: () => this.SUBRULE(this.Command) },\n                    { ALT: () => this.SUBRULE(this.IfExpression) },\n                ]);\n                this.SUBRULE(this.Termination);\n            });\n        }",
+    "definition": [
+      {
+        "type": "RepetitionMandatory",
+        "idx": 0,
+        "definition": [
+          {
+            "type": "Alternation",
+            "idx": 0,
+            "definition": [
+              {
+                "type": "Flat",
+                "definition": [
+                  {
+                    "type": "NonTerminal",
+                    "name": "Command",
+                    "idx": 0
+                  }
+                ]
+              },
+              {
+                "type": "Flat",
+                "definition": [
+                  {
+                    "type": "NonTerminal",
+                    "name": "IfExpression",
+                    "idx": 0
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "NonTerminal",
+            "name": "Termination",
+            "idx": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "type": "Rule",
+    "name": "Termination",
+    "orgText": "() => {\n            this.OR([\n                { ALT: () => this.CONSUME(tokens_1.SEMICOLON) },\n                { ALT: () => this.CONSUME(tokens_1.NEWLINE) },\n            ]);\n        }",
+    "definition": [
+      {
+        "type": "Alternation",
+        "idx": 0,
+        "definition": [
+          {
+            "type": "Flat",
+            "definition": [
+              {
+                "type": "Terminal",
+                "name": "SEMICOLON",
+                "label": "SEMICOLON",
+                "idx": 0,
+                "pattern": ";"
+              }
+            ]
+          },
+          {
+            "type": "Flat",
+            "definition": [
+              {
+                "type": "Terminal",
+                "name": "NEWLINE",
+                "label": "NEWLINE",
+                "idx": 0,
+                "pattern": "\\s*[\\n\\r]+"
               }
             ]
           }
@@ -316,7 +383,7 @@
   {
     "type": "Rule",
     "name": "IfCondition",
-    "orgText": "() => {\n            this.CONSUME(tokens_1.SQ_BRAQUET_LEFT);\n            this.CONSUME(tokens_1.IDENTIFIER);\n            this.CONSUME(tokens_1.SQ_BRAQUET_RIGHT);\n            this.OR([\n                { ALT: () => this.CONSUME(tokens_1.SEMICOLON) },\n                { ALT: () => this.CONSUME(tokens_1.NEWLINE) },\n            ]);\n        }",
+    "orgText": "() => {\n            this.CONSUME(tokens_1.SQ_BRAQUET_LEFT);\n            this.CONSUME(tokens_1.IDENTIFIER);\n            this.CONSUME(tokens_1.SQ_BRAQUET_RIGHT);\n            this.SUBRULE(this.Termination);\n        }",
     "definition": [
       {
         "type": "Terminal",
@@ -340,41 +407,16 @@
         "pattern": "]"
       },
       {
-        "type": "Alternation",
-        "idx": 0,
-        "definition": [
-          {
-            "type": "Flat",
-            "definition": [
-              {
-                "type": "Terminal",
-                "name": "SEMICOLON",
-                "label": "SEMICOLON",
-                "idx": 0,
-                "pattern": ";"
-              }
-            ]
-          },
-          {
-            "type": "Flat",
-            "definition": [
-              {
-                "type": "Terminal",
-                "name": "NEWLINE",
-                "label": "NEWLINE",
-                "idx": 0,
-                "pattern": "\\s*[\\n\\r]+"
-              }
-            ]
-          }
-        ]
+        "type": "NonTerminal",
+        "name": "Termination",
+        "idx": 0
       }
     ]
   },
   {
     "type": "Rule",
     "name": "IfExpression",
-    "orgText": "() => {\n            this.CONSUME(tokens_1.IF);\n            this.SUBRULE(this.IfCondition);\n            this.CONSUME(tokens_1.THEN);\n            this.SUBRULE(this.MultipleCommand);\n            this.CONSUME(tokens_1.FI);\n        }",
+    "orgText": "() => {\n            this.CONSUME(tokens_1.IF);\n            this.SUBRULE(this.IfCondition);\n            this.CONSUME(tokens_1.THEN);\n            this.OPTION(() => {\n                this.CONSUME(tokens_1.NEWLINE);\n            });\n            this.SUBRULE(this.MultipleCommandWithTerminator);\n            this.CONSUME(tokens_1.FI);\n        }",
     "definition": [
       {
         "type": "Terminal",
@@ -396,8 +438,21 @@
         "pattern": "then"
       },
       {
+        "type": "Option",
+        "idx": 0,
+        "definition": [
+          {
+            "type": "Terminal",
+            "name": "NEWLINE",
+            "label": "NEWLINE",
+            "idx": 0,
+            "pattern": "\\s*[\\n\\r]+"
+          }
+        ]
+      },
+      {
         "type": "NonTerminal",
-        "name": "MultipleCommand",
+        "name": "MultipleCommandWithTerminator",
         "idx": 0
       },
       {

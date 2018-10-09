@@ -35,12 +35,32 @@ export class Parser extends ChevParser {
   protected MultipleCommand = this.RULE('MultipleCommand', () => {
     this.AT_LEAST_ONE(() => {
       this.OR([
-        { ALT: () => this.CONSUME(SEMICOLON) },
-        { ALT: () => this.CONSUME(NEWLINE) },
+        { ALT: () => this.SUBRULE(this.Termination) },
         { ALT: () => this.SUBRULE(this.Command) },
         { ALT: () => this.SUBRULE(this.IfExpression) },
       ])
     })
+  })
+
+  protected MultipleCommandWithTerminator = this.RULE(
+    'MultipleCommandWithTerminator',
+    () => {
+      this.AT_LEAST_ONE(() => {
+        this.OR([
+          { ALT: () => this.SUBRULE(this.Command) },
+          { ALT: () => this.SUBRULE(this.IfExpression) },
+        ])
+
+        this.SUBRULE(this.Termination)
+      })
+    }
+  )
+
+  protected Termination = this.RULE('Termination', () => {
+    this.OR([
+      { ALT: () => this.CONSUME(SEMICOLON) },
+      { ALT: () => this.CONSUME(NEWLINE) },
+    ])
   })
 
   protected Command = this.RULE('Command', () => {
@@ -102,17 +122,17 @@ export class Parser extends ChevParser {
     this.CONSUME(IDENTIFIER)
     this.CONSUME(SQ_BRAQUET_RIGHT)
 
-    this.OR([
-      { ALT: () => this.CONSUME(SEMICOLON) },
-      { ALT: () => this.CONSUME(NEWLINE) },
-    ])
+    this.SUBRULE(this.Termination)
   })
 
   protected IfExpression = this.RULE('IfExpression', () => {
     this.CONSUME(IF)
     this.SUBRULE(this.IfCondition)
     this.CONSUME(THEN)
-    this.SUBRULE(this.MultipleCommand)
+    this.OPTION(() => {
+      this.CONSUME(NEWLINE)
+    })
+    this.SUBRULE(this.MultipleCommandWithTerminator)
     this.CONSUME(FI)
   })
 

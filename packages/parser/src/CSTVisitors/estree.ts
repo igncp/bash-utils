@@ -152,9 +152,11 @@ export const getESTreeConverterVisitor = ({ parser }) => {
         'IfCondition',
         'IfExpression',
         'MultipleCommand',
+        'MultipleCommandWithTerminator',
         'Redirection',
         'RedirectionA',
         'RedirectionB',
+        'Termination',
       ].forEach(type => {
         this[type] = ctx => {
           return transformChildrenTo({ type, ctx, key: 'body', visitor: this })

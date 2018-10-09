@@ -27,10 +27,8 @@ describe('parse errors', () => {
 
   test('if conditions', () => {
     checkThrows('if [ foo bar ]; then bar; fi')
-  })
-
-  test.skip('known issues', () => {
     checkThrows('if [ foo ]; then bar fi')
+    checkThrows('if [ true ]; then; echo; fi')
   })
 })
 
