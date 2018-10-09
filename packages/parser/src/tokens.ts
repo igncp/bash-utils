@@ -48,6 +48,14 @@ export const ELIF = createToken({
   name: 'ELIF',
   pattern: 'elif',
 })
+export const SQ_BRAQUET_LEFT = createToken({
+  name: 'SQ_BRAQUET_LEFT',
+  pattern: '[',
+})
+export const SQ_BRAQUET_RIGHT = createToken({
+  name: 'SQ_BRAQUET_RIGHT',
+  pattern: ']',
+})
 
 const WHITESPACE = createToken({
   group: Lexer.SKIPPED,
@@ -78,6 +86,8 @@ export const ALL_TOKENS = [
   THEN,
   ELSE,
   ELIF,
+  SQ_BRAQUET_LEFT,
+  SQ_BRAQUET_RIGHT,
 
   // last
   IDENTIFIER,

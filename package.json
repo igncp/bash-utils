@@ -7,7 +7,7 @@
   "scripts": {
     "build": "lerna run build",
     "clean": "sh helpers/clean.sh",
-    "docs": "lerna run docs",
+    "docs": "sh helpers/docs.sh",
     "lint": "sh helpers/lint.sh",
     "postinstall": "lerna bootstrap",
     "publish": "sh helpers/publish.sh",

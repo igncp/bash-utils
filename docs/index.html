@@ -1,0 +1,418 @@
+
+<!-- This is a generated file -->
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+  body {
+    background-color: hsl(30, 20%, 95%)
+  }
+</style>
+
+
+<link rel='stylesheet' href='https://unpkg.com/chevrotain@3.7.4/diagrams/diagrams.css'>
+
+<script src='https://unpkg.com/chevrotain@3.7.4/diagrams/vendor/railroad-diagrams.js'></script>
+<script src='https://unpkg.com/chevrotain@3.7.4/diagrams/src/diagrams_builder.js'></script>
+<script src='https://unpkg.com/chevrotain@3.7.4/diagrams/src/diagrams_behavior.js'></script>
+<script src='https://unpkg.com/chevrotain@3.7.4/diagrams/src/main.js'></script>
+
+<div id="diagrams" align="center"></div>    
+
+<script>
+    window.serializedGrammar = [
+  {
+    "type": "Rule",
+    "name": "Script",
+    "orgText": "() => {\n            this.OPTION(() => {\n                this.SUBRULE(this.MultipleCommand);\n            });\n            this.OPTION1(() => {\n                this.CONSUME(chevrotain_1.EOF);\n            });\n        }",
+    "definition": [
+      {
+        "type": "Option",
+        "idx": 0,
+        "definition": [
+          {
+            "type": "NonTerminal",
+            "name": "MultipleCommand",
+            "idx": 0
+          }
+        ]
+      },
+      {
+        "type": "Option",
+        "idx": 1,
+        "definition": [
+          {
+            "type": "Terminal",
+            "name": "EOF",
+            "label": "EOF",
+            "idx": 0,
+            "pattern": "NOT_APPLICABLE"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "type": "Rule",
+    "name": "MultipleCommand",
+    "orgText": "() => {\n            this.AT_LEAST_ONE(() => {\n                this.OR([\n                    { ALT: () => this.CONSUME(tokens_1.SEMICOLON) },\n                    { ALT: () => this.CONSUME(tokens_1.NEWLINE) },\n                    { ALT: () => this.SUBRULE(this.Command) },\n                    { ALT: () => this.SUBRULE(this.IfExpression) },\n                ]);\n            });\n        }",
+    "definition": [
+      {
+        "type": "RepetitionMandatory",
+        "idx": 0,
+        "definition": [
+          {
+            "type": "Alternation",
+            "idx": 0,
+            "definition": [
+              {
+                "type": "Flat",
+                "definition": [
+                  {
+                    "type": "Terminal",
+                    "name": "SEMICOLON",
+                    "label": "SEMICOLON",
+                    "idx": 0,
+                    "pattern": ";"
+                  }
+                ]
+              },
+              {
+                "type": "Flat",
+                "definition": [
+                  {
+                    "type": "Terminal",
+                    "name": "NEWLINE",
+                    "label": "NEWLINE",
+                    "idx": 0,
+                    "pattern": "\\s*[\\n\\r]+"
+                  }
+                ]
+              },
+              {
+                "type": "Flat",
+                "definition": [
+                  {
+                    "type": "NonTerminal",
+                    "name": "Command",
+                    "idx": 0
+                  }
+                ]
+              },
+              {
+                "type": "Flat",
+                "definition": [
+                  {
+                    "type": "NonTerminal",
+                    "name": "IfExpression",
+                    "idx": 0
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "type": "Rule",
+    "name": "Command",
+    "orgText": "() => {\n            this.AT_LEAST_ONE(() => {\n                this.MANY(() => {\n                    this.SUBRULE(this.Assignment);\n                });\n                this.CONSUME(tokens_1.IDENTIFIER);\n                this.MANY1(() => {\n                    this.OR([\n                        { ALT: () => this.SUBRULE1(this.Assignment) },\n                        { ALT: () => this.CONSUME1(tokens_1.IDENTIFIER) },\n                    ]);\n                });\n            });\n            this.OPTION(() => {\n                this.SUBRULE2(this.Redirection);\n            });\n        }",
+    "definition": [
+      {
+        "type": "RepetitionMandatory",
+        "idx": 0,
+        "definition": [
+          {
+            "type": "Repetition",
+            "idx": 0,
+            "definition": [
+              {
+                "type": "NonTerminal",
+                "name": "Assignment",
+                "idx": 0
+              }
+            ]
+          },
+          {
+            "type": "Terminal",
+            "name": "IDENTIFIER",
+            "label": "IDENTIFIER",
+            "idx": 0,
+            "pattern": "([A-Za-z_]+[A-Za-z0-9_]*)"
+          },
+          {
+            "type": "Repetition",
+            "idx": 1,
+            "definition": [
+              {
+                "type": "Alternation",
+                "idx": 0,
+                "definition": [
+                  {
+                    "type": "Flat",
+                    "definition": [
+                      {
+                        "type": "NonTerminal",
+                        "name": "Assignment",
+                        "idx": 1
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Flat",
+                    "definition": [
+                      {
+                        "type": "Terminal",
+                        "name": "IDENTIFIER",
+                        "label": "IDENTIFIER",
+                        "idx": 1,
+                        "pattern": "([A-Za-z_]+[A-Za-z0-9_]*)"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "Option",
+        "idx": 0,
+        "definition": [
+          {
+            "type": "NonTerminal",
+            "name": "Redirection",
+            "idx": 2
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "type": "Rule",
+    "name": "Assignment",
+    "orgText": "() => {\n            this.CONSUME1(tokens_1.IDENTIFIER);\n            this.CONSUME2(tokens_1.EQUAL);\n            this.CONSUME3(tokens_1.IDENTIFIER);\n        }",
+    "definition": [
+      {
+        "type": "Terminal",
+        "name": "IDENTIFIER",
+        "label": "IDENTIFIER",
+        "idx": 1,
+        "pattern": "([A-Za-z_]+[A-Za-z0-9_]*)"
+      },
+      {
+        "type": "Terminal",
+        "name": "EQUAL",
+        "label": "EQUAL",
+        "idx": 2,
+        "pattern": "="
+      },
+      {
+        "type": "Terminal",
+        "name": "IDENTIFIER",
+        "label": "IDENTIFIER",
+        "idx": 3,
+        "pattern": "([A-Za-z_]+[A-Za-z0-9_]*)"
+      }
+    ]
+  },
+  {
+    "type": "Rule",
+    "name": "WordList",
+    "orgText": "() => {\n            this.AT_LEAST_ONE(() => {\n                this.CONSUME(tokens_1.IDENTIFIER);\n            });\n        }",
+    "definition": [
+      {
+        "type": "RepetitionMandatory",
+        "idx": 0,
+        "definition": [
+          {
+            "type": "Terminal",
+            "name": "IDENTIFIER",
+            "label": "IDENTIFIER",
+            "idx": 0,
+            "pattern": "([A-Za-z_]+[A-Za-z0-9_]*)"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "type": "Rule",
+    "name": "Redirection",
+    "orgText": "() => {\n            this.OR([\n                {\n                    ALT: () => this.SUBRULE(this.RedirectionA),\n                },\n                {\n                    ALT: () => this.SUBRULE(this.RedirectionB),\n                },\n            ]);\n        }",
+    "definition": [
+      {
+        "type": "Alternation",
+        "idx": 0,
+        "definition": [
+          {
+            "type": "Flat",
+            "definition": [
+              {
+                "type": "NonTerminal",
+                "name": "RedirectionA",
+                "idx": 0
+              }
+            ]
+          },
+          {
+            "type": "Flat",
+            "definition": [
+              {
+                "type": "NonTerminal",
+                "name": "RedirectionB",
+                "idx": 0
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "type": "Rule",
+    "name": "RedirectionA",
+    "orgText": "() => {\n            this.CONSUME(tokens_1.REDIRECTION_FORWARD_SINGLE);\n            this.CONSUME(tokens_1.IDENTIFIER);\n        }",
+    "definition": [
+      {
+        "type": "Terminal",
+        "name": "REDIRECTION_FORWARD_SINGLE",
+        "label": "REDIRECTION_FORWARD_SINGLE",
+        "idx": 0,
+        "pattern": ">"
+      },
+      {
+        "type": "Terminal",
+        "name": "IDENTIFIER",
+        "label": "IDENTIFIER",
+        "idx": 0,
+        "pattern": "([A-Za-z_]+[A-Za-z0-9_]*)"
+      }
+    ]
+  },
+  {
+    "type": "Rule",
+    "name": "RedirectionB",
+    "orgText": "() => {\n            this.CONSUME(tokens_1.REDIRECTION_FORWARD_DOUBLE);\n            this.CONSUME(tokens_1.IDENTIFIER);\n        }",
+    "definition": [
+      {
+        "type": "Terminal",
+        "name": "REDIRECTION_FORWARD_DOUBLE",
+        "label": "REDIRECTION_FORWARD_DOUBLE",
+        "idx": 0,
+        "pattern": ">>"
+      },
+      {
+        "type": "Terminal",
+        "name": "IDENTIFIER",
+        "label": "IDENTIFIER",
+        "idx": 0,
+        "pattern": "([A-Za-z_]+[A-Za-z0-9_]*)"
+      }
+    ]
+  },
+  {
+    "type": "Rule",
+    "name": "IfCondition",
+    "orgText": "() => {\n            this.CONSUME(tokens_1.SQ_BRAQUET_LEFT);\n            this.CONSUME(tokens_1.IDENTIFIER);\n            this.CONSUME(tokens_1.SQ_BRAQUET_RIGHT);\n            this.OR([\n                { ALT: () => this.CONSUME(tokens_1.SEMICOLON) },\n                { ALT: () => this.CONSUME(tokens_1.NEWLINE) },\n            ]);\n        }",
+    "definition": [
+      {
+        "type": "Terminal",
+        "name": "SQ_BRAQUET_LEFT",
+        "label": "SQ_BRAQUET_LEFT",
+        "idx": 0,
+        "pattern": "["
+      },
+      {
+        "type": "Terminal",
+        "name": "IDENTIFIER",
+        "label": "IDENTIFIER",
+        "idx": 0,
+        "pattern": "([A-Za-z_]+[A-Za-z0-9_]*)"
+      },
+      {
+        "type": "Terminal",
+        "name": "SQ_BRAQUET_RIGHT",
+        "label": "SQ_BRAQUET_RIGHT",
+        "idx": 0,
+        "pattern": "]"
+      },
+      {
+        "type": "Alternation",
+        "idx": 0,
+        "definition": [
+          {
+            "type": "Flat",
+            "definition": [
+              {
+                "type": "Terminal",
+                "name": "SEMICOLON",
+                "label": "SEMICOLON",
+                "idx": 0,
+                "pattern": ";"
+              }
+            ]
+          },
+          {
+            "type": "Flat",
+            "definition": [
+              {
+                "type": "Terminal",
+                "name": "NEWLINE",
+                "label": "NEWLINE",
+                "idx": 0,
+                "pattern": "\\s*[\\n\\r]+"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "type": "Rule",
+    "name": "IfExpression",
+    "orgText": "() => {\n            this.CONSUME(tokens_1.IF);\n            this.SUBRULE(this.IfCondition);\n            this.CONSUME(tokens_1.THEN);\n            this.SUBRULE(this.MultipleCommand);\n            this.CONSUME(tokens_1.FI);\n        }",
+    "definition": [
+      {
+        "type": "Terminal",
+        "name": "IF",
+        "label": "IF",
+        "idx": 0,
+        "pattern": "if"
+      },
+      {
+        "type": "NonTerminal",
+        "name": "IfCondition",
+        "idx": 0
+      },
+      {
+        "type": "Terminal",
+        "name": "THEN",
+        "label": "THEN",
+        "idx": 0,
+        "pattern": "then"
+      },
+      {
+        "type": "NonTerminal",
+        "name": "MultipleCommand",
+        "idx": 0
+      },
+      {
+        "type": "Terminal",
+        "name": "FI",
+        "label": "FI",
+        "idx": 0,
+        "pattern": "fi"
+      }
+    ]
+  }
+];
+</script>
+
+<script>
+    var diagramsDiv = document.getElementById("diagrams");
+    main.drawDiagramsFromSerializedGrammar(serializedGrammar, diagramsDiv);
+</script>

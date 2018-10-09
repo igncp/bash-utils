@@ -4,6 +4,7 @@
   "rules": {
     "indent": [true, "spaces", 2],
     "interface-name": [true, "always-prefix"],
+    "no-string-literal": false,
     "object-literal-key-quotes": [true, "as-needed"],
     "semicolon": [true, "never"]
   }

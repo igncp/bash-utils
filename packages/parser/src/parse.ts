@@ -3,11 +3,16 @@ import { EOF, Lexer as ChevLexer, Parser as ChevParser } from 'chevrotain'
 import {
   ALL_TOKENS,
   EQUAL,
+  FI,
   IDENTIFIER,
+  IF,
   NEWLINE,
   REDIRECTION_FORWARD_DOUBLE,
   REDIRECTION_FORWARD_SINGLE,
   SEMICOLON,
+  SQ_BRAQUET_LEFT,
+  SQ_BRAQUET_RIGHT,
+  THEN,
 } from './tokens'
 
 const Lexer = new ChevLexer(ALL_TOKENS, {
@@ -18,28 +23,44 @@ const Lexer = new ChevLexer(ALL_TOKENS, {
 
 export class Parser extends ChevParser {
   public Script = this.RULE('Script', () => {
-    this.MANY(() => {
-      this.OR([
-        { ALT: () => this.CONSUME(SEMICOLON) },
-        { ALT: () => this.CONSUME(NEWLINE) },
-        { ALT: () => this.SUBRULE(this.Command) },
-      ])
+    this.OPTION(() => {
+      this.SUBRULE(this.MultipleCommand)
     })
 
-    this.OPTION(() => {
+    this.OPTION1(() => {
       this.CONSUME(EOF)
     })
   })
 
-  protected Command = this.RULE('Command', () => {
-    this.MANY(() => {
-      this.SUBRULE(this.Assignment)
-    })
+  protected MultipleCommand = this.RULE('MultipleCommand', () => {
     this.AT_LEAST_ONE(() => {
-      this.CONSUME1(IDENTIFIER)
+      this.OR([
+        { ALT: () => this.CONSUME(SEMICOLON) },
+        { ALT: () => this.CONSUME(NEWLINE) },
+        { ALT: () => this.SUBRULE(this.Command) },
+        { ALT: () => this.SUBRULE(this.IfExpression) },
+      ])
     })
+  })
+
+  protected Command = this.RULE('Command', () => {
+    this.AT_LEAST_ONE(() => {
+      this.MANY(() => {
+        this.SUBRULE(this.Assignment)
+      })
+
+      this.CONSUME(IDENTIFIER)
+
+      this.MANY1(() => {
+        this.OR([
+          { ALT: () => this.SUBRULE1(this.Assignment) },
+          { ALT: () => this.CONSUME1(IDENTIFIER) },
+        ])
+      })
+    })
+
     this.OPTION(() => {
-      this.SUBRULE(this.Redirection)
+      this.SUBRULE2(this.Redirection)
     })
   })
 
@@ -55,7 +76,6 @@ export class Parser extends ChevParser {
     })
   })
 
-  // @TODO complete
   protected Redirection = this.RULE('Redirection', () => {
     this.OR([
       {
@@ -75,6 +95,25 @@ export class Parser extends ChevParser {
   protected RedirectionB = this.RULE('RedirectionB', () => {
     this.CONSUME(REDIRECTION_FORWARD_DOUBLE)
     this.CONSUME(IDENTIFIER)
+  })
+
+  protected IfCondition = this.RULE('IfCondition', () => {
+    this.CONSUME(SQ_BRAQUET_LEFT)
+    this.CONSUME(IDENTIFIER)
+    this.CONSUME(SQ_BRAQUET_RIGHT)
+
+    this.OR([
+      { ALT: () => this.CONSUME(SEMICOLON) },
+      { ALT: () => this.CONSUME(NEWLINE) },
+    ])
+  })
+
+  protected IfExpression = this.RULE('IfExpression', () => {
+    this.CONSUME(IF)
+    this.SUBRULE(this.IfCondition)
+    this.CONSUME(THEN)
+    this.SUBRULE(this.MultipleCommand)
+    this.CONSUME(FI)
   })
 
   constructor(input) {

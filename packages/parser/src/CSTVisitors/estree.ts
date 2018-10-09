@@ -126,6 +126,16 @@ const getNodeParsedProperties = (ctx, visitor) => {
   }
 }
 
+const transformChildrenTo = ({ type, key, ctx, visitor }) => {
+  const { sortedArr, ...position } = getNodeParsedProperties(ctx, visitor)
+
+  return {
+    [key]: sortedArr,
+    ...position,
+    type,
+  }
+}
+
 export const getESTreeConverterVisitor = ({ parser }) => {
   const BaseSQLVisitorWithDefaults = parser.getBaseCstVisitorConstructorWithDefaults()
 
@@ -136,37 +146,38 @@ export const getESTreeConverterVisitor = ({ parser }) => {
       this.validateVisitor()
 
       this.tokens = []
+      ;[
+        'Assignment',
+        'Command',
+        'IfCondition',
+        'IfExpression',
+        'MultipleCommand',
+        'Redirection',
+        'RedirectionA',
+        'RedirectionB',
+      ].forEach(type => {
+        this[type] = ctx => {
+          return transformChildrenTo({ type, ctx, key: 'body', visitor: this })
+        }
+      })
     }
 
     public onTokenFound(token) {
       this.tokens.push(token)
     }
 
-    public Command(ctx) {
-      const { sortedArr: body, ...position } = getNodeParsedProperties(
-        ctx,
-        this
-      )
-
-      return {
-        body,
-        ...position,
-        type: 'Command',
-      }
-    }
-
     public Script(ctx) {
-      const { sortedArr: body, ...position } = getNodeParsedProperties(
+      const result = transformChildrenTo({
         ctx,
-        this
-      )
+        key: 'body',
+        type: 'Program',
+        visitor: this,
+      })
       const tokens = this.getProgramTokens()
 
       return {
-        body,
+        ...result,
         tokens,
-        ...position,
-        type: 'Program',
       }
     }
 

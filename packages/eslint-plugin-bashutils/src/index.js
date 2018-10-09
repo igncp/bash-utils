@@ -28,8 +28,15 @@ const FAKE_AST = {
 }
 
 const FAKE_VISITOR_KEYS = {
-  Program: ['body'],
+  Assignment: ['body'],
   Command: ['body'],
+  IfCondition: ['body'],
+  IfExpression: ['body'],
+  MultipleCommand: ['body'],
+  Program: ['body'],
+  Redirection: ['body]'],
+  RedirectionA: ['body'],
+  RedirectionB: ['body'],
 }
 
 const parseForESLint = (code: string) => {
