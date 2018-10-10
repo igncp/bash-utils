@@ -184,63 +184,18 @@
   {
     "type": "Rule",
     "name": "Command",
-    "orgText": "() => {\n            this.AT_LEAST_ONE(() => {\n                this.MANY(() => {\n                    this.SUBRULE(this.Assignment);\n                });\n                this.CONSUME(tokens_1.IDENTIFIER);\n                this.MANY1(() => {\n                    this.OR([\n                        { ALT: () => this.SUBRULE1(this.Assignment) },\n                        { ALT: () => this.CONSUME1(tokens_1.IDENTIFIER) },\n                    ]);\n                });\n            });\n            this.OPTION(() => {\n                this.SUBRULE2(this.Redirection);\n            });\n        }",
+    "orgText": "() => {\n            this.AT_LEAST_ONE(() => {\n                this.CONSUME(tokens_1.IDENTIFIER);\n            });\n            this.OPTION(() => {\n                this.SUBRULE2(this.Redirection);\n            });\n        }",
     "definition": [
       {
         "type": "RepetitionMandatory",
         "idx": 0,
         "definition": [
           {
-            "type": "Repetition",
-            "idx": 0,
-            "definition": [
-              {
-                "type": "NonTerminal",
-                "name": "Assignment",
-                "idx": 0
-              }
-            ]
-          },
-          {
             "type": "Terminal",
             "name": "IDENTIFIER",
             "label": "IDENTIFIER",
             "idx": 0,
-            "pattern": "([A-Za-z_]+[A-Za-z0-9_]*)"
-          },
-          {
-            "type": "Repetition",
-            "idx": 1,
-            "definition": [
-              {
-                "type": "Alternation",
-                "idx": 0,
-                "definition": [
-                  {
-                    "type": "Flat",
-                    "definition": [
-                      {
-                        "type": "NonTerminal",
-                        "name": "Assignment",
-                        "idx": 1
-                      }
-                    ]
-                  },
-                  {
-                    "type": "Flat",
-                    "definition": [
-                      {
-                        "type": "Terminal",
-                        "name": "IDENTIFIER",
-                        "label": "IDENTIFIER",
-                        "idx": 1,
-                        "pattern": "([A-Za-z_]+[A-Za-z0-9_]*)"
-                      }
-                    ]
-                  }
-                ]
-              }
-            ]
+            "pattern": "([A-Za-z_\\-0-9=\\/.$@~%#]+)"
           }
         ]
       },
@@ -259,34 +214,6 @@
   },
   {
     "type": "Rule",
-    "name": "Assignment",
-    "orgText": "() => {\n            this.CONSUME1(tokens_1.IDENTIFIER);\n            this.CONSUME2(tokens_1.EQUAL);\n            this.CONSUME3(tokens_1.IDENTIFIER);\n        }",
-    "definition": [
-      {
-        "type": "Terminal",
-        "name": "IDENTIFIER",
-        "label": "IDENTIFIER",
-        "idx": 1,
-        "pattern": "([A-Za-z_]+[A-Za-z0-9_]*)"
-      },
-      {
-        "type": "Terminal",
-        "name": "EQUAL",
-        "label": "EQUAL",
-        "idx": 2,
-        "pattern": "="
-      },
-      {
-        "type": "Terminal",
-        "name": "IDENTIFIER",
-        "label": "IDENTIFIER",
-        "idx": 3,
-        "pattern": "([A-Za-z_]+[A-Za-z0-9_]*)"
-      }
-    ]
-  },
-  {
-    "type": "Rule",
     "name": "WordList",
     "orgText": "() => {\n            this.AT_LEAST_ONE(() => {\n                this.CONSUME(tokens_1.IDENTIFIER);\n            });\n        }",
     "definition": [
@@ -299,7 +226,7 @@
             "name": "IDENTIFIER",
             "label": "IDENTIFIER",
             "idx": 0,
-            "pattern": "([A-Za-z_]+[A-Za-z0-9_]*)"
+            "pattern": "([A-Za-z_\\-0-9=\\/.$@~%#]+)"
           }
         ]
       }
@@ -355,7 +282,7 @@
         "name": "IDENTIFIER",
         "label": "IDENTIFIER",
         "idx": 0,
-        "pattern": "([A-Za-z_]+[A-Za-z0-9_]*)"
+        "pattern": "([A-Za-z_\\-0-9=\\/.$@~%#]+)"
       }
     ]
   },
@@ -376,7 +303,7 @@
         "name": "IDENTIFIER",
         "label": "IDENTIFIER",
         "idx": 0,
-        "pattern": "([A-Za-z_]+[A-Za-z0-9_]*)"
+        "pattern": "([A-Za-z_\\-0-9=\\/.$@~%#]+)"
       }
     ]
   },
@@ -397,7 +324,7 @@
         "name": "IDENTIFIER",
         "label": "IDENTIFIER",
         "idx": 0,
-        "pattern": "([A-Za-z_]+[A-Za-z0-9_]*)"
+        "pattern": "([A-Za-z_\\-0-9=\\/.$@~%#]+)"
       },
       {
         "type": "Terminal",

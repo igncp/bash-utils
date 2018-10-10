@@ -2,7 +2,7 @@ import { createToken, Lexer } from 'chevrotain'
 
 export const IDENTIFIER = createToken({
   name: 'IDENTIFIER',
-  pattern: /([A-Za-z_]+[A-Za-z0-9_]*)/,
+  pattern: /([A-Za-z_\-0-9=\/.$@~%#]+)/,
 })
 export const TERMINATOR = createToken({ name: 'TERMINATOR', pattern: Lexer.NA })
 

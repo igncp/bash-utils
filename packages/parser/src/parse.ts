@@ -2,7 +2,6 @@ import { EOF, Lexer as ChevLexer, Parser as ChevParser } from 'chevrotain'
 
 import {
   ALL_TOKENS,
-  EQUAL,
   FI,
   IDENTIFIER,
   IF,
@@ -65,29 +64,12 @@ export class Parser extends ChevParser {
 
   protected Command = this.RULE('Command', () => {
     this.AT_LEAST_ONE(() => {
-      this.MANY(() => {
-        this.SUBRULE(this.Assignment)
-      })
-
       this.CONSUME(IDENTIFIER)
-
-      this.MANY1(() => {
-        this.OR([
-          { ALT: () => this.SUBRULE1(this.Assignment) },
-          { ALT: () => this.CONSUME1(IDENTIFIER) },
-        ])
-      })
     })
 
     this.OPTION(() => {
       this.SUBRULE2(this.Redirection)
     })
-  })
-
-  protected Assignment = this.RULE('Assignment', () => {
-    this.CONSUME1(IDENTIFIER)
-    this.CONSUME2(EQUAL)
-    this.CONSUME3(IDENTIFIER)
   })
 
   protected WordList = this.RULE('WordList', () => {

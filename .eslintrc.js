@@ -6,7 +6,7 @@ module.exports = {
   env: {
     node: true,
   },
-  plugins: ['import', 'flowtype'],
+  plugins: ['import', 'flowtype', 'eslint-comments'],
   settings: {
     'import/parser': 'babel-eslint',
     flowtype: {
@@ -283,6 +283,15 @@ module.exports = {
     'flowtype/union-intersection-spacing': [ERROR, 'always'],
     'flowtype/use-flow-type': ERROR,
     'flowtype/valid-syntax': ERROR,
+
+    'eslint-comments/disable-enable-pair': ERROR,
+    'eslint-comments/no-aggregating-enable': ERROR,
+    'eslint-comments/no-duplicate-disable': ERROR,
+    'eslint-comments/no-restricted-disable': ERROR,
+    'eslint-comments/no-unlimited-disable': ERROR,
+    'eslint-comments/no-unused-disable': ERROR,
+    'eslint-comments/no-unused-enable': ERROR,
+    'eslint-comments/no-use': 0,
   },
 
   overrides: [

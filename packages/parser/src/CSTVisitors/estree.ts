@@ -191,5 +191,13 @@ export const getESTreeConverterVisitor = ({ parser }) => {
     }
   }
 
-  return new CSTVisitor() as any
+  return {
+    visit(initialResult) {
+      const firstVisitor = new CSTVisitor()
+
+      const cstResult = firstVisitor.visit(initialResult)
+
+      return cstResult
+    },
+  }
 }

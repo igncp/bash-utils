@@ -5,6 +5,10 @@ export default {
     },
   },
   create(ctx) {
+    // missing: new AST transformation to generate assignments
+    throw new Error('This rule is not available yet')
+
+    // eslint-disable-next-line no-unreachable
     return {
       Assignment(node) {
         ctx.report({

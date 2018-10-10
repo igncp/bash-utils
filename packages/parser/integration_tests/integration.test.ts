@@ -9,26 +9,49 @@ const checkThrows = text => {
   expect(() => buildESTreeAstFromSource(text)).toThrow()
 }
 
+// @TODO: some of these should not throw but return errors instead
 describe('parse errors', () => {
   it('throws when wrong argument', () => {
     expect(() => (parse as any)()).toThrow('You must pass a string as source')
     expect(() => (parse as any)(1)).toThrow('You must pass a string as source')
   })
 
-  // @TODO: some of these should not throw but return errors instead
   test('redirections', () => {
     checkThrows('foo >>')
-  })
-
-  test('simple commands', () => {
-    checkThrows('foo=BAR=baz foo')
-    checkThrows('foo==bar foo')
   })
 
   test('if conditions', () => {
     checkThrows('if [ foo bar ]; then bar; fi')
     checkThrows('if [ foo ]; then bar fi')
     checkThrows('if [ true ]; then; echo; fi')
+  })
+
+  test('strings', () => {
+    checkThrows('foo " bar')
+    checkThrows("foo ' bar")
+  })
+
+  test('parameters expansion', () => {
+    checkThrows('${foo')
+  })
+
+  test('command expansion', () => {
+    checkThrows('$(foo')
+    checkThrows('`foo')
+  })
+
+  test('arithmetic expansion', () => {
+    checkThrows('$((foo')
+  })
+
+  test('process substitution', () => {
+    checkThrows('<( foo')
+  })
+
+  test('misc', () => {
+    checkThrows('echo foo(')
+    checkThrows('echo foo()')
+    checkThrows('echo foo)')
   })
 })
 
@@ -48,11 +71,36 @@ const checkNoErrors = text => {
 }
 
 describe('non parse errors', () => {
+  test.skip('known issues - should not error but error', () => {
+    checkNoErrors('foo "bar"')
+    checkNoErrors("foo 'bar'")
+    checkNoErrors('echo <(cat foo.txt)')
+    checkNoErrors('cat $(echo foo.txt)')
+    checkNoErrors('bar `foo`')
+    checkNoErrors('bar ${foo}`')
+    checkNoErrors('echo "$FOO"')
+    checkNoErrors('echo foo\\(')
+    checkNoErrors('# foo $(( "')
+    checkNoErrors('#!/usr/bin/env bash')
+    checkNoErrors('echo "$@"')
+    checkNoErrors('echo "$@@@"')
+    checkNoErrors('echo \\(\\)')
+  })
+
   test('simple commands', () => {
-    checkNoErrors('foo')
-    checkNoErrors('foo bar')
+    checkNoErrors('.//foo/bar.baz bar')
+    checkNoErrors('./foo/bar.baz foo')
+    checkNoErrors('echo $ FOO')
+    checkNoErrors('echo $.a@#%~')
+    checkNoErrors('echo $FOO')
+    checkNoErrors('foo ./bar/baz.sh')
+    checkNoErrors('foo > ./bar/baz.sh')
     checkNoErrors('foo bar baz bam')
+    checkNoErrors('foo bar')
+    checkNoErrors('foo')
+    checkNoErrors('foo-bar')
     checkNoErrors('foo_bar baz bam')
+    checkNoErrors('set -e')
   })
 
   test('redirections', () => {

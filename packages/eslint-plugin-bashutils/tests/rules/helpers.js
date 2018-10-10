@@ -25,6 +25,10 @@ export const runTest = (ruleName, rule, tests) => {
   })
 }
 
+runTest.skip = ruleName => {
+  describe.skip(ruleName)
+}
+
 export const ruleTestMapper = opts => ({
   ...opts,
   parser,
