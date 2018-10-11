@@ -6,13 +6,14 @@ import { walk } from '../src/CSTVisitors/estree/walker'
 
 const debug = false
 
-  const getIsPos1Before2 = (pos1, pos2) =>
-    pos1.line < pos2.line ||
-    (pos1.line === pos2.line && pos1.column < pos2.column)
+const getIsPos1Before2 = (pos1, pos2) =>
+  pos1.line < pos2.line ||
+  (pos1.line === pos2.line && pos1.column < pos2.column)
 
 const getAreLocsOverlapping = (locA, locB) => {
   return (
-    getIsPos1Before2(locA.start, locB.end) && getIsPos1Before2(locB.start, locA.end)
+    getIsPos1Before2(locA.start, locB.end) &&
+    getIsPos1Before2(locB.start, locA.end)
   )
 }
 
@@ -37,7 +38,9 @@ const validateRangesAndLocs = ({ treeResult }) => {
         expect(treeItem.range[0] >= 0).toEqual(true)
         expect(treeItem.range[1] >= 0).toEqual(true)
         expect(treeItem.range[0] < treeItem.range[1]).toEqual(true)
-        expect(getIsPos1Before2(treeItem.loc.start, treeItem.loc.end)).toEqual(true)
+        expect(getIsPos1Before2(treeItem.loc.start, treeItem.loc.end)).toEqual(
+          true
+        )
       } catch (e) {
         // debugger
         throw e

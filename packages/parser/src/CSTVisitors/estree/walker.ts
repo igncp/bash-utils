@@ -1,8 +1,11 @@
 // forked from: https://github.com/Rich-Harris/estree-walker/blob/master/src/estree-walker.js
 // with the addition of: it will ignore the `parent` key
 
-// tslint:disable-next-line
-export function walk(ast, { enter, leave }: { enter?: Function, leave?: Function }) {
+export function walk(
+  ast,
+  // tslint:disable-next-line
+  { enter, leave }: { enter?: Function; leave?: Function }
+) {
   visit(ast, null, enter, leave, undefined, undefined)
 }
 

@@ -225,9 +225,7 @@ export const getBaseVisitor = ({ parser }) => {
     }
 
     private getProgramComments() {
-      return this.comments
-        .slice(0)
-        .sort(sortByRange)
+      return this.comments.slice(0).sort(sortByRange)
     }
   }
 

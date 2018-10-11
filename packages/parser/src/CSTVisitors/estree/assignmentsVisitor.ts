@@ -19,7 +19,10 @@ const createAssignment = (token, tokenIdx, tokens) => {
   assignmentNode.body.push({
     ...token,
     loc: {
-      end: { line: token.loc.start.line, column: token.loc.start.column + first.length },
+      end: {
+        column: token.loc.start.column + first.length,
+        line: token.loc.start.line,
+      },
       start: { line: token.loc.start.line, column: token.loc.start.column },
     },
     range: [token.range[0], token.range[0] + first.length],
@@ -29,10 +32,19 @@ const createAssignment = (token, tokenIdx, tokens) => {
   assignmentNode.body.push({
     ...token,
     loc: {
-      end: { line: token.loc.start.line, column: assignmentNode.body[0].loc.end.column + 2 },
-      start: { line: token.loc.start.line, column: assignmentNode.body[0].loc.end.column },
+      end: {
+        column: assignmentNode.body[0].loc.end.column + 2,
+        line: token.loc.start.line,
+      },
+      start: {
+        column: assignmentNode.body[0].loc.end.column,
+        line: token.loc.start.line,
+      },
     },
-    range: [assignmentNode.body[0].range[1], assignmentNode.body[0].range[1] + 1],
+    range: [
+      assignmentNode.body[0].range[1],
+      assignmentNode.body[0].range[1] + 1,
+    ],
     value: '=',
   })
 
@@ -40,10 +52,19 @@ const createAssignment = (token, tokenIdx, tokens) => {
     assignmentNode.body.push({
       ...token,
       loc: {
-        end: { line: token.loc.start.line, column: assignmentNode.body[1].loc.end.column + last.length },
-        start: { line: token.loc.start.line, column: assignmentNode.body[1].loc.end.column },
+        end: {
+          column: assignmentNode.body[1].loc.end.column + last.length,
+          line: token.loc.start.line,
+        },
+        start: {
+          column: assignmentNode.body[1].loc.end.column,
+          line: token.loc.start.line,
+        },
       },
-      range: [assignmentNode.body[1].range[1], assignmentNode.body[1].range[1] + last.length],
+      range: [
+        assignmentNode.body[1].range[1],
+        assignmentNode.body[1].range[1] + last.length,
+      ],
       value: last,
     })
   }

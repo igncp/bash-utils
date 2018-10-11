@@ -1,14 +1,14 @@
 import { walk } from './walker'
 
 const visitTreeToRemoveParents = tree => {
-    walk(tree, {
-      enter(node) {
-        if (node.parent) {
-          delete node.parent
-          delete node.parentKey
-        }
+  walk(tree, {
+    enter(node) {
+      if (node.parent) {
+        delete node.parent
+        delete node.parentKey
       }
-    })
+    },
+  })
 
   return tree
 }
