@@ -1,5 +1,7 @@
 import { EOF } from 'chevrotain'
 
+import * as allTokens from '../../tokens'
+
 const sortByRange = (a, b) => {
   if (typeof a.range[0] === 'undefined') {
     return 1
@@ -21,6 +23,9 @@ const parseToken = item => {
     }
   }
 
+  // https://eslint.org/docs/developer-guide/working-with-custom-parsers#all-nodes
+  // code.slice(node.range[0], node.range[1]) must be the text of the node.
+  // This range does not include spaces/parentheses which are around the node.
   const range = [item.startOffset, item.startOffset + item.image.length]
 
   return {
@@ -136,7 +141,7 @@ const transformChildrenTo = ({ type, key, ctx, visitor }) => {
   }
 }
 
-export const getESTreeConverterVisitor = ({ parser }) => {
+export const getBaseVisitor = ({ parser }) => {
   const BaseSQLVisitorWithDefaults = parser.getBaseCstVisitorConstructorWithDefaults()
 
   class CSTVisitor extends BaseSQLVisitorWithDefaults {
@@ -145,12 +150,15 @@ export const getESTreeConverterVisitor = ({ parser }) => {
 
       this.validateVisitor()
 
+      this.comments = []
       this.tokens = []
       ;[
         'Assignment',
         'Command',
+        'Comment',
         'IfCondition',
         'IfExpression',
+        'Literal',
         'MultipleCommand',
         'MultipleCommandWithTerminator',
         'Redirection',
@@ -159,13 +167,21 @@ export const getESTreeConverterVisitor = ({ parser }) => {
         'Termination',
       ].forEach(type => {
         this[type] = ctx => {
-          return transformChildrenTo({ type, ctx, key: 'body', visitor: this })
+          const key = 'body'
+
+          const node = transformChildrenTo({ type, ctx, key, visitor: this })
+
+          return this.getSameNodeWithParentInChildren(node, [key])
         }
       })
     }
 
     public onTokenFound(token) {
-      this.tokens.push(token)
+      if (token.type === allTokens.COMMENT.tokenName) {
+        this.comments.push(token)
+      } else {
+        this.tokens.push(token)
+      }
     }
 
     public Script(ctx) {
@@ -176,11 +192,29 @@ export const getESTreeConverterVisitor = ({ parser }) => {
         visitor: this,
       })
       const tokens = this.getProgramTokens()
+      const comments = this.getProgramComments()
 
-      return {
-        ...result,
-        tokens,
-      }
+      return this.getSameNodeWithParentInChildren(
+        {
+          ...result,
+          comments,
+          tokens,
+        },
+        ['body']
+      )
+    }
+
+    public getSameNodeWithParentInChildren(node, keys) {
+      keys.forEach(key => {
+        const children = node[key] || []
+
+        children.forEach(child => {
+          child.parent = node
+          child.parentKey = key
+        })
+      })
+
+      return node
     }
 
     private getProgramTokens() {
@@ -189,15 +223,19 @@ export const getESTreeConverterVisitor = ({ parser }) => {
         .sort(sortByRange)
         .filter(t => t.type !== 'EOF')
     }
+
+    private getProgramComments() {
+      return this.comments
+        .slice(0)
+        .sort(sortByRange)
+    }
   }
 
+  const visitor = new CSTVisitor()
+
   return {
-    visit(initialResult) {
-      const firstVisitor = new CSTVisitor()
-
-      const cstResult = firstVisitor.visit(initialResult)
-
-      return cstResult
+    visit(parserResult) {
+      return visitor.visit(parserResult)
     },
   }
 }

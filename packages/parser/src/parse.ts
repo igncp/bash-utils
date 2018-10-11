@@ -2,6 +2,7 @@ import { EOF, Lexer as ChevLexer, Parser as ChevParser } from 'chevrotain'
 
 import {
   ALL_TOKENS,
+  COMMENT,
   FI,
   IDENTIFIER,
   IF,
@@ -11,6 +12,7 @@ import {
   SEMICOLON,
   SQ_BRAQUET_LEFT,
   SQ_BRAQUET_RIGHT,
+  STRING,
   THEN,
 } from './tokens'
 
@@ -22,11 +24,11 @@ const Lexer = new ChevLexer(ALL_TOKENS, {
 
 export class Parser extends ChevParser {
   public Script = this.RULE('Script', () => {
-    this.OPTION(() => {
+    this.OPTION1(() => {
       this.SUBRULE(this.MultipleCommand)
     })
 
-    this.OPTION1(() => {
+    this.OPTION2(() => {
       this.CONSUME(EOF)
     })
   })
@@ -37,6 +39,7 @@ export class Parser extends ChevParser {
         { ALT: () => this.SUBRULE(this.Termination) },
         { ALT: () => this.SUBRULE(this.Command) },
         { ALT: () => this.SUBRULE(this.IfExpression) },
+        { ALT: () => this.SUBRULE(this.Comment) },
       ])
     })
   })
@@ -64,7 +67,7 @@ export class Parser extends ChevParser {
 
   protected Command = this.RULE('Command', () => {
     this.AT_LEAST_ONE(() => {
-      this.CONSUME(IDENTIFIER)
+      this.SUBRULE(this.Literal)
     })
 
     this.OPTION(() => {
@@ -105,6 +108,17 @@ export class Parser extends ChevParser {
     this.CONSUME(SQ_BRAQUET_RIGHT)
 
     this.SUBRULE(this.Termination)
+  })
+
+  protected Comment = this.RULE('Comment', () => {
+    this.CONSUME(COMMENT)
+  })
+
+  protected Literal = this.RULE('Literal', () => {
+    this.OR([
+      { ALT: () => this.CONSUME(STRING) },
+      { ALT: () => this.CONSUME(IDENTIFIER) },
+    ])
   })
 
   protected IfExpression = this.RULE('IfExpression', () => {

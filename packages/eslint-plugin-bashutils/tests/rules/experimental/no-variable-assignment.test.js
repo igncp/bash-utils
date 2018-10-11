@@ -6,7 +6,7 @@ const expectedErrorMessage = {
   message: 'Variable assignments are not allowed',
 }
 
-runTest.skip('no-variable-assignment', rule, {
+runTest('no-variable-assignment', rule, {
   valid: [
     {
       code: 'echo foo',

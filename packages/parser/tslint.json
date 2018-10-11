@@ -6,6 +6,7 @@
     "interface-name": [true, "always-prefix"],
     "no-string-literal": false,
     "object-literal-key-quotes": [true, "as-needed"],
+    "prefer-for-of": false,
     "semicolon": [true, "never"]
   }
 }

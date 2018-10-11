@@ -1,6 +1,9 @@
 // @flow
 
-import { buildESTreeAstFromSource } from '@bash-utils/parser'
+import {
+  buildESTreeAstFromSource,
+  visitorKeysForESTree,
+} from '@bash-utils/parser'
 
 import { version, name } from '../package.json'
 
@@ -27,18 +30,6 @@ const FAKE_AST = {
   range: [],
 }
 
-const FAKE_VISITOR_KEYS = {
-  Assignment: ['body'],
-  Command: ['body'],
-  IfCondition: ['body'],
-  IfExpression: ['body'],
-  MultipleCommand: ['body'],
-  Program: ['body'],
-  Redirection: ['body]'],
-  RedirectionA: ['body'],
-  RedirectionB: ['body'],
-}
-
 const parseForESLint = (code: string) => {
   const value = buildESTreeAstFromSource(code)
 
@@ -50,7 +41,7 @@ const parseForESLint = (code: string) => {
     code,
     scopeManager,
     services: {},
-    visitorKeys: FAKE_VISITOR_KEYS,
+    visitorKeys: visitorKeysForESTree,
   }
 }
 

@@ -10,6 +10,7 @@
 ## References
 
 - Chevrotain: https://github.com/SAP/chevrotain
+  - Same version docs: https://sap.github.io/chevrotain/documentation/3_7_4/globals.html
   - Debugging Ambiguities: https://sap.github.io/chevrotain/docs/FAQ.html#STUCK_AMBIGUITY
 - https://github.com/RokuRoad/bright
 - https://github.com/vorpaljs/bash-parser

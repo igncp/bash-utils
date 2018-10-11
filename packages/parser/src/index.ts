@@ -1,5 +1,8 @@
 import { getDummyCSTVisitor } from './CSTVisitors/dummy'
-import { getESTreeConverterVisitor } from './CSTVisitors/estree'
+import {
+  getESTreeConverterVisitor,
+  visitorKeys as visitorKeysForESTree,
+} from './CSTVisitors/estree'
 import { parse } from './parse'
 import * as exposedTokens from './tokens'
 
@@ -22,6 +25,7 @@ const buildESTreeAstFromSource = (source: string) => {
 export {
   buildDummyTreeFromSouce,
   buildESTreeAstFromSource,
+  visitorKeysForESTree,
   parse,
   exposedTokens as tokens,
 }

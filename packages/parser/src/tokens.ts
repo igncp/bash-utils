@@ -2,7 +2,7 @@ import { createToken, Lexer } from 'chevrotain'
 
 export const IDENTIFIER = createToken({
   name: 'IDENTIFIER',
-  pattern: /([A-Za-z_\-0-9=\/.$@~%#]+)/,
+  pattern: /[A-Za-z_\-0-9=\/.$@~%#\\]+/,
 })
 export const TERMINATOR = createToken({ name: 'TERMINATOR', pattern: Lexer.NA })
 
@@ -20,8 +20,6 @@ export const REDIRECTION_FORWARD_DOUBLE = createToken({
   name: 'REDIRECTION_FORWARD_DOUBLE',
   pattern: '>>',
 })
-
-export const EQUAL = createToken({ name: 'EQUAL', pattern: '=' })
 
 export const IF = createToken({
   longer_alt: IDENTIFIER,
@@ -56,6 +54,14 @@ export const SQ_BRAQUET_RIGHT = createToken({
   name: 'SQ_BRAQUET_RIGHT',
   pattern: ']',
 })
+export const COMMENT = createToken({
+  name: 'COMMENT',
+  pattern: /#[^\n\r]*/,
+})
+export const STRING = createToken({
+  name: 'STRING',
+  pattern: /(["'])((\\{2})*|(.*?[^\\](\\{2})*))\1/,
+})
 
 const WHITESPACE = createToken({
   group: Lexer.SKIPPED,
@@ -74,9 +80,10 @@ export const ALL_TOKENS = [
   // first
   NEWLINE,
   WHITESPACE,
+  STRING,
+  COMMENT,
 
   //
-  EQUAL,
   TERMINATOR,
   SEMICOLON,
   REDIRECTION_FORWARD_DOUBLE,

@@ -10,3 +10,4 @@
 
 - https://github.com/RokuRoad/eslint-plugin-roku
 - https://eslint.org/docs/developer-guide/nodejs-api
+- https://eslint.org/parser/
