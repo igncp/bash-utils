@@ -55,14 +55,14 @@ const visitTreeToParseBackticks = (tree, visitAllRecursive) => {
           column: start.column + 1,
           line: start.line,
         })
-
-        ;[[newItem.tokens, newTokensToAdd], [newItem.comments, newCommentsToAdd]].forEach(
-          ([arr, extraArr]) => {
-            arr.forEach(i => {
-              extraArr.push(i)
-            })
-          }
-        )
+        ;[
+          [newItem.tokens, newTokensToAdd],
+          [newItem.comments, newCommentsToAdd],
+        ].forEach(([arr, extraArr]) => {
+          arr.forEach(i => {
+            extraArr.push(i)
+          })
+        })
       }
     },
 
@@ -77,10 +77,10 @@ const visitTreeToParseBackticks = (tree, visitAllRecursive) => {
           }
         }
 
-        newTokensToAdd.forEach((t) => {
+        newTokensToAdd.forEach(t => {
           item.tokens.push(t)
         })
-        newCommentsToAdd.forEach((t) => {
+        newCommentsToAdd.forEach(t => {
           item.comments.push(t)
         })
 
