@@ -1,6 +1,6 @@
-import rule from '../../../src/rules/experimental/no-variable-assignment'
+import rule from '../no-variable-assignment'
 
-import { runTest, ruleTestMapper } from '../helpers'
+import { runTest, ruleTestMapper } from '../../../../helpers/testsHelpers'
 
 const expectedErrorMessage = {
   message: 'Variable assignments are not allowed',

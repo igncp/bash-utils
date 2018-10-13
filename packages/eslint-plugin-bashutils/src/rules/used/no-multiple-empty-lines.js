@@ -1,8 +1,12 @@
 // @flow
 
+/**
+ * Disallows adding more than one empty lines
+ */
+
 import { tokens as availableTokens } from '@bash-utils/parser'
 
-import type { T_Context, T_Node } from '../types'
+import type { T_Context, T_Node } from '../../types'
 
 // @TODO:
 // - Option to configure the number of lines
@@ -25,7 +29,7 @@ export default {
         )
 
         newLineTokens.forEach(t => {
-          if (t.value.split('\n').length > 2) {
+          if (t.value.split('\n').length > 3) {
             ctx.report({
               message: 'Multiple empty lines are not allowed',
               node: t,

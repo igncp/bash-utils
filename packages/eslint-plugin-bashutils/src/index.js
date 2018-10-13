@@ -7,10 +7,9 @@ import {
 
 import { version, name } from '../package.json'
 
-import rules from './rules'
+import normalRules from './rules/used'
+import experimentalRules from './rules/experimental'
 import { scopeManager } from './scopeManager'
-
-const { experimental: experimentalRules, ...normalRules } = rules
 
 const finalRules = process.env.BASH_UTILS_USE_EXPERIMENTAL_RULES
   ? { ...normalRules, ...experimentalRules }

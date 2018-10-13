@@ -1,6 +1,6 @@
-import rule from '../../../src/rules/experimental/one-line'
+import rule from '../one-line'
 
-import { runTest, ruleTestMapper } from '../helpers'
+import { runTest, ruleTestMapper } from '../../../../helpers/testsHelpers'
 
 const expectedErrorMessage = {
   message: 'New line is not allowed',

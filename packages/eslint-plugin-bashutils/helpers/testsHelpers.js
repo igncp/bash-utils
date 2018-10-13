@@ -1,7 +1,7 @@
 import path from 'path'
 import { RuleTester } from 'eslint'
 
-import { configs } from '../../src'
+import { configs } from '../src'
 
 const ruleTester = new RuleTester({
   ...{
@@ -10,7 +10,7 @@ const ruleTester = new RuleTester({
   },
 })
 
-const parser = path.resolve(path.join(__dirname, '../../src'))
+const parser = path.resolve(path.join(__dirname, '../src'))
 
 export const runTest = (ruleName, rule, tests) => {
   describe(ruleName, () => {

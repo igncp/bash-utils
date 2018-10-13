@@ -1,6 +1,6 @@
-import rule from '../../src/rules/no-multiple-empty-lines'
+import rule from '../no-multiple-empty-lines'
 
-import { runTest, ruleTestMapper } from './helpers'
+import { runTest, ruleTestMapper } from '../../../../helpers/testsHelpers'
 
 const expectedErrorMessage = {
   message: 'Multiple empty lines are not allowed',
@@ -18,7 +18,7 @@ runTest('no-multiple-empty-lines', rule, {
       code: 'echo foo\necho bar',
     },
     {
-      code: 'echo foo\necho\necho',
+      code: 'echo\n\necho',
     },
   ].map(ruleTestMapper),
   invalid: [
@@ -28,7 +28,7 @@ runTest('no-multiple-empty-lines', rule, {
     },
     {
       code: 'echo foo\n\n\necho\n\necho',
-      errors: [expectedErrorMessage, expectedErrorMessage],
+      errors: [expectedErrorMessage],
     },
   ].map(ruleTestMapper),
 })

@@ -1,10 +1,11 @@
 # `eslint-plugin-bashutils`
 
-## TODOs
+ESLint plugin to lint files using bash (e.g. with `.sh`extension). This plugin contains several "experimental" rules that are not exposed. Feel free to contribute, even if you need some guidence to get started.
 
-- Understand how to visit AST and build scope manager from rule
-- Write docs about integration in editors (after publish)
-- Etc.
+## Rules
+
+- [**no-multiple-empty-lines**](./src/rules/used/no-multiple-empty-lines.js): Disallows adding more than one empty lines
+- [**require-shebang**](./src/rules/used/require-shebang.js): Requires adding a shebang in the top of the script
 
 ## References
 

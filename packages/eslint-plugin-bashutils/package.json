@@ -13,8 +13,9 @@
     "access": "public"
   },
   "scripts": {
-    "build": "rm -rf lib; ../../node_modules/.bin/babel --config ../../.babelrc.js -d lib src",
+    "build": "rm -rf lib; ../../node_modules/.bin/babel --config ../../.babelrc.js -d lib --ignore **/__tests__/** src",
     "prepublish": "npm run test && npm run build",
+    "run-checks": "find helpers/checks -type f | xargs -I {} bash {}",
     "test": "sh helpers/test.sh"
   },
   "peerDependencies": {

@@ -1,5 +1,9 @@
 import { tokens } from '@bash-utils/parser'
 
+/**
+ * Requires adding a shebang in the top of the script
+ */
+
 // eslint transforms shebangs to comments in the code passed to the parser
 // Can't use here the Shebang node type
 

@@ -1,6 +1,6 @@
-import rule from '../../../src/rules/experimental/require-shebang'
+import rule from '../require-shebang'
 
-import { runTest, ruleTestMapper } from '../helpers'
+import { runTest, ruleTestMapper } from '../../../../helpers/testsHelpers'
 
 const { MESSAGE_MISSING } = rule._test
 

@@ -1,6 +1,6 @@
 // @flow
 
-import type { T_Context } from '../types'
+import type { T_Context } from '../../types'
 
 const SHOULD_REPORT_DUMMY = false
 

@@ -6,11 +6,12 @@ if [ ! -d tests/integration/node_modules ]; then
   (cd tests/integration && npm i)
 fi
 
+(cd ../parser && npm run build)
 npm run build
 
 echo "running rules tests"
 
-../../node_modules/.bin/jest tests/rules
+../../node_modules/.bin/jest src/rules
 
 echo "running integration tests"
 
