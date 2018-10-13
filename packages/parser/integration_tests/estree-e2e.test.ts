@@ -1,4 +1,4 @@
-import { writeFileSync } from 'fs'
+import { readdir, readFileSync, writeFileSync } from 'fs'
 
 import { buildESTreeAstFromSource, parse, tokens } from '../src'
 import { getESTreeConverterVisitor } from '../src/CSTVisitors/estree'
@@ -14,16 +14,20 @@ describe('parse errors', () => {
 
   test("KNOWN ISSUES - they should throw but they don't", () => {
     check('"$(foo"', { throws: false })
+    check('"${foo"', { throws: false })
+    check('"$((foo"', { throws: false })
   })
 
   test('redirections', () => {
     check('foo >>', { throws: true })
   })
 
-  test('if conditions', () => {
-    check('if [ foo bar ]; then bar; fi', { throws: true })
+  test('if expressions', () => {
     check('if [ foo ]; then bar fi', { throws: true })
     check('if [ true ]; then; echo; fi', { throws: true })
+    check('if [ foo bar ]; then bar; fi', { throws: true })
+    check('if [ -z -z bar ]; then bar; fi', { throws: true })
+    check('if [ -z ]; then bar; fi', { throws: true })
   })
 
   test('strings', () => {
@@ -53,43 +57,46 @@ describe('parse errors', () => {
     check('echo foo(', { throws: true })
     check('echo foo()', { throws: true })
     check('echo foo)', { throws: true })
+  })
+
+  test('pipelines', () => {
     check('| echo', { throws: true })
   })
 })
 
 describe('non parse errors', () => {
   test('KNOWN ISSUES - should not error but error', () => {
-    check('echo <(cat foo.txt)', { throws: true })
-    check('cat $(echo foo.txt)', { throws: true })
-    check('bar `foo`', { throws: true })
-    check('bar ${foo}`', { throws: true })
     check('echo foo\\(', { throws: true })
     check('echo \\(\\)', { throws: true })
-    check('echo || echo', { throws: true })
-    check('echo | echo', { throws: true })
+    check('echo &', { throws: true })
+    check('select fname in foo; do echo $fname; done', {
+      containingNodes: ['SelectExpression'],
+      errorsCheck: true,
+    })
   })
 
   test('strings', () => {
+    check('echo foo"a"', { containingTokens: [tokens.STRING] })
     check('echo "$@@@"')
     check('echo "$@"')
-    check("foo 'bar'", { containedTokens: [tokens.STRING, tokens.IDENTIFIER] })
-    check('foo "bar"', { containedTokens: [tokens.STRING, tokens.IDENTIFIER] })
+    check("foo 'bar'", { containingTokens: [tokens.STRING, tokens.IDENTIFIER] })
+    check('foo "bar"', { containingTokens: [tokens.STRING, tokens.IDENTIFIER] })
     check("'foo'", {
-      containedTokens: [tokens.STRING],
+      containingTokens: [tokens.STRING],
       missingTokens: [tokens.IDENTIFIER],
     })
     check('"foo"', {
-      containedTokens: [tokens.STRING],
+      containingTokens: [tokens.STRING],
       missingTokens: [tokens.IDENTIFIER],
     })
     check('echo "$FOO"', {
-      containedTokens: [tokens.STRING, tokens.IDENTIFIER],
+      containingTokens: [tokens.STRING, tokens.IDENTIFIER],
     })
   })
 
   test('shebang', () => {
     check('#!/usr/bin/env bash', {
-      containedNodes: ['Shebang'],
+      containingNodes: ['Shebang'],
       containsComments: true,
     })
 
@@ -97,7 +104,7 @@ describe('non parse errors', () => {
       `#!/usr/bin/env bash
       foo`,
       {
-        containedNodes: ['Shebang'],
+        containingNodes: ['Shebang'],
         containsComments: true,
       }
     )
@@ -114,17 +121,18 @@ describe('non parse errors', () => {
 
   test('comments', () => {
     check('# foo $(( "', {
-      containedNodes: ['Comment'],
+      containingNodes: ['Comment'],
       missingNodes: ['Command'],
     })
     check('foo # bar $(( "', {
-      containedNodes: ['Comment', 'Command'],
+      containingNodes: ['Comment', 'Command'],
       missingNodes: [],
     })
   })
 
   test('simple commands', () => {
     check('.//foo/bar.baz bar')
+    check('find .')
     check('./foo/bar.baz foo')
     check('echo $ FOO')
     check('echo $.a@#%~', {
@@ -133,9 +141,6 @@ describe('non parse errors', () => {
     })
     check('echo $FOO')
     check('foo ./bar/baz.sh')
-    check('foo > ./bar/baz.sh', {
-      containedNodes: ['Redirection'],
-    })
     check('foo bar baz bam')
     check('foo bar')
     check('foo')
@@ -145,29 +150,75 @@ describe('non parse errors', () => {
   })
 
   test('redirections', () => {
-    check('foo > bar', { containedNodes: ['Redirection'] })
-    check('foo bar > baz')
-    check('foo > bar baz')
-    check('foo bar > baz bam')
+    check('foo > ./bar/baz.sh', {
+      containingNodes: ['Redirection'],
+    })
+    check('foo > bar', { containingNodes: ['Redirection'] })
+    check('foo bar > baz', { containingNodes: ['Redirection'] })
+    check('foo > bar baz', { containingNodes: ['Redirection'] })
+    check('foo bar > baz bam', { containingNodes: ['Redirection'] })
 
-    check('foo >> bar')
-    check('foo bar >> baz')
-    check('foo >> baz baz')
+    check('foo >> bar', { containingNodes: ['Redirection'] })
+    check('foo bar >> baz', { containingNodes: ['Redirection'] })
+    check('foo >> baz baz', { containingNodes: ['Redirection'] })
   })
 
   test('assignments', () => {
-    check('FOO=BAR', { containedNodes: ['Assignment'] })
-    check('FOO=BAR foo', { containedNodes: ['Assignment'] })
+    check('FOO=BAR', { containingNodes: ['Assignment'] })
+    check('FOO=BAR foo', { containingNodes: ['Assignment'] })
+    check('FOO=BAR foo > baz', { containingNodes: ['Assignment'] })
+    check('FOO=BAR foo bar', { containingNodes: ['Assignment'] })
+    check('FOO=BAR foo BAR=foo', { containingNodes: ['Assignment'] })
+    ;['FOO="BAR" echo baz', "FOO='BAR' echo baz"].forEach(text => {
+      check(text, {
+        containingNodes: ['Assignment'],
+        containingTokens: [tokens.STRING],
+        traverseFn: node => {
+          if (node.type === 'Assignment') {
+            expect(node.body).toHaveLength(3)
+          }
+        },
+      })
+    })
+    check('FOO=BAR FOO2=BAR2 foo bar', { containingNodes: ['Assignment'] })
+
+    check('F$O=BAR', { missingNodes: ['Assignment'] })
     check('=BARFoo foo', { missingNodes: ['Assignment'] })
     check('BARFoo foo', { missingNodes: ['Assignment'] })
-    check('FOO=BAR foo > baz', { containedNodes: ['Assignment'] })
-    check('FOO=BAR foo bar', { containedNodes: ['Assignment'] })
-    check('FOO=BAR foo BAR=foo', { containedNodes: ['Assignment'] })
-    check('FOO=BAR FOO2=BAR2 foo bar', { containedNodes: ['Assignment'] })
+  })
+
+  test('substitutions and expansions', () => {
+    check('echo <(cat foo.txt)', {
+      containingNodes: ['ProcessSubstitution'],
+      missingNodes: ['CommandSubstitution', 'ParameterExpansion'],
+    })
+    check('cat $(echo foo.txt)', {
+      containingNodes: ['CommandSubstitution'],
+      missingNodes: ['ProcessSubstitution', 'ParameterExpansion'],
+    })
+    check('bar ${foo}', {
+      containingNodes: ['ParameterExpansion'],
+      missingNodes: ['CommandSubstitution', 'ProcessSubstitution'],
+    })
+    check('bar ${foo | bar > baz}')
+    check('echo $()')
+    check('echo $( $( echo foo ) )')
+    check('if [ $() $() -z bar ]; then bar; fi')
+    check('if [ `` `` `` -z bar ]; then bar; fi')
+    check('`foo`', { containingTokens: [tokens.IDENTIFIER] })
   })
 
   test('if expressions', () => {
     check('if [ foo ]; then bar; fi')
+    check('if [ foo ] || [ bar]; then echo foo; fi')
+    check('if [ foo ] && [ bar]; then echo foo; fi')
+    check('if [ foo ] && [[ bar]]; then echo foo; fi')
+    check('if [ -z foo ]; then bar; fi', {
+      containingNodes: ['IfConditionSingleBrackets'],
+    })
+    check('if [ bar -ne foo ]; then bar; fi', {
+      containingNodes: ['IfConditionSingleBrackets'],
+    })
     check('if [ foo     ]; then bar; fi')
     check(
       `if [ foo ]
@@ -175,5 +226,49 @@ describe('non parse errors', () => {
   bar
   fi`
     )
+  })
+
+  test('pipes', () => {
+    check('echo | echo', { containingNodes: ['Pipeline'] })
+    check('find . | grep foo', { containingNodes: ['Pipeline'] })
+  })
+
+  test('command continuations', () => {
+    check('echo || echo')
+    check('echo && echo')
+    check(`echo foo \\
+    bar`)
+    check(
+      `echo | \\
+      /tmp/bar`,
+      {
+        traverseFn: item => {
+          if (item.type === tokens.IDENTIFIER.tokenName) {
+            expect(item.value !== 'echo' || item.value !== '/tmp/bar').toEqual(
+              true
+            )
+          }
+        },
+      }
+    )
+  })
+
+  test('files', done => {
+    const filesPath = __dirname + '/fixture_files'
+    readdir(filesPath, (err, files) => {
+      if (err) {
+        throw err
+      }
+
+      files.forEach(fileName => {
+        const fileContent = readFileSync(filesPath + '/' + fileName, 'utf-8')
+
+        expect(typeof fileContent).toEqual('string')
+
+        check(fileContent)
+      })
+
+      done()
+    })
   })
 })

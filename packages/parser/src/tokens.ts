@@ -2,7 +2,7 @@ import { createToken, Lexer } from 'chevrotain'
 
 export const IDENTIFIER = createToken({
   name: 'IDENTIFIER',
-  pattern: /[A-Za-z_\-0-9=\/.$@~%#\\]+/,
+  pattern: /[A-Za-z_\-0-9=\/.$@~%#]+/,
 })
 export const TERMINATOR = createToken({ name: 'TERMINATOR', pattern: Lexer.NA })
 
@@ -31,6 +31,10 @@ export const FI = createToken({
   name: 'FI',
   pattern: 'fi',
 })
+export const BACKTICK = createToken({
+  name: 'BACKTICK',
+  pattern: /`/,
+})
 export const THEN = createToken({
   longer_alt: IDENTIFIER,
   name: 'THEN',
@@ -46,13 +50,45 @@ export const ELIF = createToken({
   name: 'ELIF',
   pattern: 'elif',
 })
-export const SQ_BRAQUET_LEFT = createToken({
-  name: 'SQ_BRAQUET_LEFT',
+export const SQ_BRACKET_LEFT = createToken({
+  name: 'SQ_BRACKET_LEFT',
   pattern: '[',
 })
-export const SQ_BRAQUET_RIGHT = createToken({
-  name: 'SQ_BRAQUET_RIGHT',
+export const PROCESS_SUBSTITUTION_LT_LEFT = createToken({
+  name: 'PROCESS_SUBSTITUTION_LT_LEFT',
+  pattern: '<(',
+})
+export const PROCESS_SUBSTITUTION_GT_LEFT = createToken({
+  name: 'PROCESS_SUBSTITUTION_GT_LEFT',
+  pattern: '>(',
+})
+export const COMMAND_SUBSTITUTION_LEFT = createToken({
+  name: 'COMMAND_SUBSTITUTION_LEFT',
+  pattern: '$(',
+})
+export const PARAMETER_EXPANSION_LEFT = createToken({
+  name: 'PARAMETER_EXPANSION_LEFT',
+  pattern: '${',
+})
+export const PARENTHESES_RIGHT = createToken({
+  name: 'PARENTHESES_RIGHT',
+  pattern: ')',
+})
+export const CURLY_BRACKET_RIGHT = createToken({
+  name: 'CURLY_BRACKET_RIGHT',
+  pattern: '}',
+})
+export const SQ_BRACKET_2_LEFT = createToken({
+  name: 'SQ_BRACKET_2_LEFT',
+  pattern: '[[',
+})
+export const SQ_BRACKET_RIGHT = createToken({
+  name: 'SQ_BRACKET_RIGHT',
   pattern: ']',
+})
+export const SQ_BRACKET_2_RIGHT = createToken({
+  name: 'SQ_BRACKET_2_RIGHT',
+  pattern: ']]',
 })
 export const COMMENT = createToken({
   name: 'COMMENT',
@@ -62,11 +98,33 @@ export const STRING = createToken({
   name: 'STRING',
   pattern: /(["'])((\\{2})*|(.*?[^\\](\\{2})*))\1/,
 })
+export const BACKTICK_STRING = createToken({
+  name: 'BACKTICK_STRING',
+  pattern: /([`])((\\{2})*|(.*?[^\\](\\{2})*))\1/,
+})
+export const PIPE = createToken({
+  name: 'PIPE',
+  pattern: '|',
+})
+export const OR = createToken({
+  name: 'OR',
+  pattern: '||',
+})
+export const AND = createToken({
+  name: 'AND',
+  pattern: '&&',
+})
 
 const WHITESPACE = createToken({
   group: Lexer.SKIPPED,
   name: 'WHITESPACE',
   pattern: /[\s\t]+/,
+})
+const LINE_CONTINUATION = createToken({
+  group: Lexer.SKIPPED,
+  name: 'LINE_CONTINUATION',
+  pattern: `\\
+`,
 })
 
 export const NEWLINE = createToken({
@@ -77,24 +135,39 @@ export const NEWLINE = createToken({
 })
 
 export const ALL_TOKENS = [
-  // first
+  LINE_CONTINUATION,
   NEWLINE,
   WHITESPACE,
+
+  // first
   STRING,
+  BACKTICK_STRING,
   COMMENT,
 
   //
+  COMMAND_SUBSTITUTION_LEFT,
+  PROCESS_SUBSTITUTION_LT_LEFT,
+  PROCESS_SUBSTITUTION_GT_LEFT,
+  PARAMETER_EXPANSION_LEFT,
+  PARENTHESES_RIGHT,
+  CURLY_BRACKET_RIGHT,
+  AND,
+  OR,
   TERMINATOR,
   SEMICOLON,
   REDIRECTION_FORWARD_DOUBLE,
   REDIRECTION_FORWARD_SINGLE,
   IF,
+  PIPE,
   FI,
   THEN,
   ELSE,
   ELIF,
-  SQ_BRAQUET_LEFT,
-  SQ_BRAQUET_RIGHT,
+  SQ_BRACKET_2_LEFT,
+  SQ_BRACKET_2_RIGHT,
+  SQ_BRACKET_LEFT,
+  SQ_BRACKET_RIGHT,
+  BACKTICK,
 
   // last
   IDENTIFIER,

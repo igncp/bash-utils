@@ -1,12 +1,14 @@
 import * as allTokens from '../../tokens'
 
-import { replaceItemInParent } from './treeHelpers'
+import {
+  getRangeAndLocForText,
+  moveNextNodeInsideIfNoSeparation,
+  replaceItemInParent,
+} from './treeHelpers'
 import { walk } from './walker'
 
-const createAssignment = (token, tokenIdx, tokens) => {
+const createAssignment = ({ token, tokenIdx, tokens }) => {
   // @TODO: Multiline assignments
-  // @TODO: Assignments to strings
-
   const [first, ...rest] = token.value.split('=')
   const last = rest.join('=')
 
@@ -16,75 +18,66 @@ const createAssignment = (token, tokenIdx, tokens) => {
     type: 'Assignment',
   }
 
-  assignmentNode.body.push({
+  const firstToken = {
     ...token,
-    loc: {
-      end: {
-        column: token.loc.start.column + first.length,
-        line: token.loc.start.line,
-      },
-      start: { line: token.loc.start.line, column: token.loc.start.column },
-    },
-    range: [token.range[0], token.range[0] + first.length],
+    ...getRangeAndLocForText(token.loc.start, token.range[0], first),
     value: first,
-  })
+  }
 
-  assignmentNode.body.push({
+  assignmentNode.body.push(firstToken)
+
+  const secondToken = {
     ...token,
-    loc: {
-      end: {
-        column: assignmentNode.body[0].loc.end.column + 2,
-        line: token.loc.start.line,
-      },
-      start: {
-        column: assignmentNode.body[0].loc.end.column,
-        line: token.loc.start.line,
-      },
-    },
-    range: [
-      assignmentNode.body[0].range[1],
-      assignmentNode.body[0].range[1] + 1,
-    ],
+    ...getRangeAndLocForText(firstToken.loc.end, firstToken.range[1], '='),
     value: '=',
-  })
+  }
+
+  assignmentNode.body.push(secondToken)
 
   if (last) {
     assignmentNode.body.push({
       ...token,
-      loc: {
-        end: {
-          column: assignmentNode.body[1].loc.end.column + last.length,
-          line: token.loc.start.line,
-        },
-        start: {
-          column: assignmentNode.body[1].loc.end.column,
-          line: token.loc.start.line,
-        },
-      },
-      range: [
-        assignmentNode.body[1].range[1],
-        assignmentNode.body[1].range[1] + last.length,
-      ],
+      ...getRangeAndLocForText(secondToken.loc.end, secondToken.range[1], last),
       value: last,
     })
   }
 
   tokens.splice(tokenIdx, 1)
 
-  assignmentNode.body.forEach(newToken => {
-    tokens.splice(tokenIdx, 0, newToken)
-  })
+  // using reverse order to add items back
+  for (let i = assignmentNode.body.length - 1; i >= 0; i--) {
+    tokens.splice(tokenIdx, 0, assignmentNode.body[i])
+  }
 
   delete assignmentNode.value
 
-  replaceItemInParent(token, assignmentNode)
-
+  replaceItemInParent(token.parent, assignmentNode)
   assignmentNode.body.forEach(item => {
     item.parent = assignmentNode
     item.parentKey = 'body'
   })
 
+  token.parent.parent = null
   token.parent = null
+
+  if (!last) {
+    moveNextNodeInsideIfNoSeparation(assignmentNode, 'body')
+  }
+}
+
+const getIsValidAssignment = token => {
+  if (
+    token.type === allTokens.IDENTIFIER.tokenName &&
+    token.value[0] !== '=' &&
+    token.value.includes('=') &&
+    token.parent.type !== 'Assignment'
+  ) {
+    const [first] = token.value.split('=')
+
+    return /^[A-Za-z_]+$/.test(first)
+  }
+
+  return false
 }
 
 const visitAstToCreateAssignments = tree => {
@@ -103,13 +96,8 @@ const visitAstToCreateAssignments = tree => {
             for (let i = 0; i < tokens.length; i++) {
               const token = tokens[i]
 
-              if (
-                token.type === allTokens.IDENTIFIER.tokenName &&
-                token.value[0] !== '=' &&
-                token.value.includes('=') &&
-                token.parent.type !== 'Assignment'
-              ) {
-                createAssignment(token, i, tokens)
+              if (getIsValidAssignment(token)) {
+                createAssignment({ token, tokenIdx: i, tokens })
                 assignmentFound = true
                 break
               }
@@ -132,4 +120,8 @@ export const getAssignmentsVisitor = () => {
       return visitAstToCreateAssignments(tree)
     },
   }
+}
+
+export const assignmentsVisitorKeysObj = {
+  Assignment: ['body'],
 }

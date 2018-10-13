@@ -2,16 +2,28 @@ import { EOF, Lexer as ChevLexer, Parser as ChevParser } from 'chevrotain'
 
 import {
   ALL_TOKENS,
+  AND,
+  BACKTICK_STRING,
+  COMMAND_SUBSTITUTION_LEFT,
   COMMENT,
+  CURLY_BRACKET_RIGHT,
   FI,
   IDENTIFIER,
   IF,
   NEWLINE,
+  OR,
+  PARAMETER_EXPANSION_LEFT,
+  PARENTHESES_RIGHT,
+  PIPE,
+  PROCESS_SUBSTITUTION_GT_LEFT,
+  PROCESS_SUBSTITUTION_LT_LEFT,
   REDIRECTION_FORWARD_DOUBLE,
   REDIRECTION_FORWARD_SINGLE,
   SEMICOLON,
-  SQ_BRAQUET_LEFT,
-  SQ_BRAQUET_RIGHT,
+  SQ_BRACKET_2_LEFT,
+  SQ_BRACKET_2_RIGHT,
+  SQ_BRACKET_LEFT,
+  SQ_BRACKET_RIGHT,
   STRING,
   THEN,
 } from './tokens'
@@ -33,12 +45,19 @@ export class Parser extends ChevParser {
     })
   })
 
+  protected Literal = this.RULE('Literal', () => {
+    this.OR([
+      { ALT: () => this.CONSUME(IDENTIFIER) },
+      { ALT: () => this.CONSUME(STRING) },
+    ])
+  })
+
   protected MultipleCommand = this.RULE('MultipleCommand', () => {
     this.AT_LEAST_ONE(() => {
       this.OR([
         { ALT: () => this.SUBRULE(this.Termination) },
-        { ALT: () => this.SUBRULE(this.Command) },
         { ALT: () => this.SUBRULE(this.IfExpression) },
+        { ALT: () => this.SUBRULE(this.Pipeline) },
         { ALT: () => this.SUBRULE(this.Comment) },
       ])
     })
@@ -49,7 +68,7 @@ export class Parser extends ChevParser {
     () => {
       this.AT_LEAST_ONE(() => {
         this.OR([
-          { ALT: () => this.SUBRULE(this.Command) },
+          { ALT: () => this.SUBRULE(this.Pipeline) },
           { ALT: () => this.SUBRULE(this.IfExpression) },
         ])
 
@@ -65,13 +84,99 @@ export class Parser extends ChevParser {
     ])
   })
 
+  protected CommandUnit = this.RULE('CommandUnit', () => {
+    this.OR([
+      { ALT: () => this.SUBRULE(this.Literal) },
+      { ALT: () => this.SUBRULE(this.ProcessSubstitution) },
+      { ALT: () => this.SUBRULE(this.CommandSubstitution) },
+      { ALT: () => this.SUBRULE(this.ParameterExpansion) },
+    ])
+  })
+
+  protected ProcessSubstitution = this.RULE('ProcessSubstitution', () => {
+    this.OR([
+      {
+        ALT: () => {
+          this.CONSUME(PROCESS_SUBSTITUTION_LT_LEFT)
+        },
+      },
+      {
+        ALT: () => {
+          this.CONSUME(PROCESS_SUBSTITUTION_GT_LEFT)
+        },
+      },
+    ])
+
+    this.SUBRULE(this.MultipleCommand)
+    this.CONSUME(PARENTHESES_RIGHT)
+  })
+
+  protected ParameterExpansion = this.RULE('ParameterExpansion', () => {
+    this.CONSUME(PARAMETER_EXPANSION_LEFT)
+    this.SUBRULE(this.MultipleCommand)
+    this.CONSUME(CURLY_BRACKET_RIGHT)
+  })
+
+  protected BacktickExpression = this.RULE('BacktickExpression', () => {
+    this.CONSUME(BACKTICK_STRING)
+  })
+
+  protected CommandSubstitution = this.RULE('CommandSubstitution', () => {
+    this.OR([
+      {
+        ALT: () => {
+          this.SUBRULE(this.BacktickExpression)
+        },
+      },
+      {
+        ALT: () => {
+          this.CONSUME(COMMAND_SUBSTITUTION_LEFT)
+          this.OPTION1(() => {
+            this.SUBRULE1(this.MultipleCommand)
+          })
+          this.CONSUME(PARENTHESES_RIGHT)
+        },
+      },
+    ])
+  })
+
   protected Command = this.RULE('Command', () => {
     this.AT_LEAST_ONE(() => {
-      this.SUBRULE(this.Literal)
+      this.SUBRULE(this.CommandUnit)
     })
 
     this.OPTION(() => {
-      this.SUBRULE2(this.Redirection)
+      this.SUBRULE1(this.Redirection)
+    })
+  })
+
+  protected ComposedCommand = this.RULE('ComposedCommand', () => {
+    this.SUBRULE(this.Command)
+
+    this.MANY(() => {
+      this.OR([
+        {
+          ALT: () => {
+            this.CONSUME(AND)
+            this.SUBRULE1(this.Command)
+          },
+        },
+        {
+          ALT: () => {
+            this.CONSUME(OR)
+            this.SUBRULE2(this.Command)
+          },
+        },
+      ])
+    })
+  })
+
+  protected Pipeline = this.RULE('Pipeline', () => {
+    this.SUBRULE(this.ComposedCommand)
+
+    this.MANY(() => {
+      this.CONSUME(PIPE)
+      this.SUBRULE1(this.ComposedCommand)
     })
   })
 
@@ -102,28 +207,61 @@ export class Parser extends ChevParser {
     this.CONSUME(IDENTIFIER)
   })
 
-  protected IfCondition = this.RULE('IfCondition', () => {
-    this.CONSUME(SQ_BRAQUET_LEFT)
-    this.CONSUME(IDENTIFIER)
-    this.CONSUME(SQ_BRAQUET_RIGHT)
+  protected IfConditionGroup = this.RULE('IfConditionGroup', () => {
+    this.SUBRULE(this.IfCondition)
 
-    this.SUBRULE(this.Termination)
+    this.MANY(() => {
+      this.OR([
+        { ALT: () => this.CONSUME(OR) },
+        { ALT: () => this.CONSUME(AND) },
+      ])
+
+      this.SUBRULE1(this.IfCondition)
+    })
+
+    this.SUBRULE2(this.Termination)
   })
+
+  protected IfCondition = this.RULE('IfCondition', () => {
+    this.OR([
+      { ALT: () => this.SUBRULE(this.IfConditionSingleBrackets) },
+      { ALT: () => this.SUBRULE1(this.IfConditionDoubleBrackets) },
+    ])
+  })
+
+  protected IfConditionSingleBrackets = this.RULE(
+    'IfConditionSingleBrackets',
+    () => {
+      this.CONSUME(SQ_BRACKET_LEFT)
+
+      this.AT_LEAST_ONE(() => {
+        this.SUBRULE(this.CommandUnit)
+      })
+
+      this.CONSUME(SQ_BRACKET_RIGHT)
+    }
+  )
+
+  protected IfConditionDoubleBrackets = this.RULE(
+    'IfConditionDoubleBrackets',
+    () => {
+      this.CONSUME(SQ_BRACKET_2_LEFT)
+
+      this.AT_LEAST_ONE(() => {
+        this.SUBRULE(this.CommandUnit)
+      })
+
+      this.CONSUME(SQ_BRACKET_2_RIGHT)
+    }
+  )
 
   protected Comment = this.RULE('Comment', () => {
     this.CONSUME(COMMENT)
   })
 
-  protected Literal = this.RULE('Literal', () => {
-    this.OR([
-      { ALT: () => this.CONSUME(STRING) },
-      { ALT: () => this.CONSUME(IDENTIFIER) },
-    ])
-  })
-
   protected IfExpression = this.RULE('IfExpression', () => {
     this.CONSUME(IF)
-    this.SUBRULE(this.IfCondition)
+    this.SUBRULE(this.IfConditionGroup)
     this.CONSUME(THEN)
     this.OPTION(() => {
       this.CONSUME(NEWLINE)
@@ -176,7 +314,7 @@ const errors = (list = []) =>
 // defining the parser once improves performance and is recommended
 const parser = new Parser([])
 
-export const parse = source => {
+export const parse = (source, { entry = 'Script' } = {}) => {
   if (typeof source !== 'string') {
     throw new Error('You must pass a string as source')
   }
@@ -192,7 +330,7 @@ export const parse = source => {
 
   parser.input = lexingResult.tokens
 
-  const value = parser.Script()
+  const value = parser[entry]()
   const parseErrors = errors(parser.errors)
 
   if (parseErrors.length) {

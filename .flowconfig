@@ -1,8 +1,11 @@
 [ignore]
+.*/node_modules/.*
+.*/lib/.*
 
 [include]
 
 [libs]
+helpers/flowtype/customDefinitions.js
 
 [lints]
 

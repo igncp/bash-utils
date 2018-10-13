@@ -23,8 +23,7 @@
     "access": "public"
   },
   "dependencies": {
-    "chevrotain": "^3.7.4",
-    "lodash": "^4.17.11"
+    "chevrotain": "^3.7.4"
   },
   "devDependencies": {
     "@types/jest": "^23.3.2",

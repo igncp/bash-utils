@@ -53,8 +53,45 @@
   },
   {
     "type": "Rule",
+    "name": "Literal",
+    "orgText": "() => {\n            this.OR([\n                { ALT: () => this.CONSUME(tokens_1.IDENTIFIER) },\n                { ALT: () => this.CONSUME(tokens_1.STRING) },\n            ]);\n        }",
+    "definition": [
+      {
+        "type": "Alternation",
+        "idx": 0,
+        "definition": [
+          {
+            "type": "Flat",
+            "definition": [
+              {
+                "type": "Terminal",
+                "name": "IDENTIFIER",
+                "label": "IDENTIFIER",
+                "idx": 0,
+                "pattern": "[A-Za-z_\\-0-9=\\/.$@~%#]+"
+              }
+            ]
+          },
+          {
+            "type": "Flat",
+            "definition": [
+              {
+                "type": "Terminal",
+                "name": "STRING",
+                "label": "STRING",
+                "idx": 0,
+                "pattern": "([\"'])((\\\\{2})*|(.*?[^\\\\](\\\\{2})*))\\1"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "type": "Rule",
     "name": "MultipleCommand",
-    "orgText": "() => {\n            this.AT_LEAST_ONE(() => {\n                this.OR([\n                    { ALT: () => this.SUBRULE(this.Termination) },\n                    { ALT: () => this.SUBRULE(this.Command) },\n                    { ALT: () => this.SUBRULE(this.IfExpression) },\n                    { ALT: () => this.SUBRULE(this.Comment) },\n                ]);\n            });\n        }",
+    "orgText": "() => {\n            this.AT_LEAST_ONE(() => {\n                this.OR([\n                    { ALT: () => this.SUBRULE(this.Termination) },\n                    { ALT: () => this.SUBRULE(this.IfExpression) },\n                    { ALT: () => this.SUBRULE(this.Pipeline) },\n                    { ALT: () => this.SUBRULE(this.Comment) },\n                ]);\n            });\n        }",
     "definition": [
       {
         "type": "RepetitionMandatory",
@@ -79,7 +116,7 @@
                 "definition": [
                   {
                     "type": "NonTerminal",
-                    "name": "Command",
+                    "name": "IfExpression",
                     "idx": 0
                   }
                 ]
@@ -89,7 +126,7 @@
                 "definition": [
                   {
                     "type": "NonTerminal",
-                    "name": "IfExpression",
+                    "name": "Pipeline",
                     "idx": 0
                   }
                 ]
@@ -113,7 +150,7 @@
   {
     "type": "Rule",
     "name": "MultipleCommandWithTerminator",
-    "orgText": "() => {\n            this.AT_LEAST_ONE(() => {\n                this.OR([\n                    { ALT: () => this.SUBRULE(this.Command) },\n                    { ALT: () => this.SUBRULE(this.IfExpression) },\n                ]);\n                this.SUBRULE(this.Termination);\n            });\n        }",
+    "orgText": "() => {\n            this.AT_LEAST_ONE(() => {\n                this.OR([\n                    { ALT: () => this.SUBRULE(this.Pipeline) },\n                    { ALT: () => this.SUBRULE(this.IfExpression) },\n                ]);\n                this.SUBRULE(this.Termination);\n            });\n        }",
     "definition": [
       {
         "type": "RepetitionMandatory",
@@ -128,7 +165,7 @@
                 "definition": [
                   {
                     "type": "NonTerminal",
-                    "name": "Command",
+                    "name": "Pipeline",
                     "idx": 0
                   }
                 ]
@@ -193,8 +230,203 @@
   },
   {
     "type": "Rule",
+    "name": "CommandUnit",
+    "orgText": "() => {\n            this.OR([\n                { ALT: () => this.SUBRULE(this.Literal) },\n                { ALT: () => this.SUBRULE(this.ProcessSubstitution) },\n                { ALT: () => this.SUBRULE(this.CommandSubstitution) },\n                { ALT: () => this.SUBRULE(this.ParameterExpansion) },\n            ]);\n        }",
+    "definition": [
+      {
+        "type": "Alternation",
+        "idx": 0,
+        "definition": [
+          {
+            "type": "Flat",
+            "definition": [
+              {
+                "type": "NonTerminal",
+                "name": "Literal",
+                "idx": 0
+              }
+            ]
+          },
+          {
+            "type": "Flat",
+            "definition": [
+              {
+                "type": "NonTerminal",
+                "name": "ProcessSubstitution",
+                "idx": 0
+              }
+            ]
+          },
+          {
+            "type": "Flat",
+            "definition": [
+              {
+                "type": "NonTerminal",
+                "name": "CommandSubstitution",
+                "idx": 0
+              }
+            ]
+          },
+          {
+            "type": "Flat",
+            "definition": [
+              {
+                "type": "NonTerminal",
+                "name": "ParameterExpansion",
+                "idx": 0
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "type": "Rule",
+    "name": "ProcessSubstitution",
+    "orgText": "() => {\n            this.OR([\n                {\n                    ALT: () => {\n                        this.CONSUME(tokens_1.PROCESS_SUBSTITUTION_LT_LEFT);\n                    },\n                },\n                {\n                    ALT: () => {\n                        this.CONSUME(tokens_1.PROCESS_SUBSTITUTION_GT_LEFT);\n                    },\n                },\n            ]);\n            this.SUBRULE(this.MultipleCommand);\n            this.CONSUME(tokens_1.PARENTHESES_RIGHT);\n        }",
+    "definition": [
+      {
+        "type": "Alternation",
+        "idx": 0,
+        "definition": [
+          {
+            "type": "Flat",
+            "definition": [
+              {
+                "type": "Terminal",
+                "name": "PROCESS_SUBSTITUTION_LT_LEFT",
+                "label": "PROCESS_SUBSTITUTION_LT_LEFT",
+                "idx": 0,
+                "pattern": "<("
+              }
+            ]
+          },
+          {
+            "type": "Flat",
+            "definition": [
+              {
+                "type": "Terminal",
+                "name": "PROCESS_SUBSTITUTION_GT_LEFT",
+                "label": "PROCESS_SUBSTITUTION_GT_LEFT",
+                "idx": 0,
+                "pattern": ">("
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "NonTerminal",
+        "name": "MultipleCommand",
+        "idx": 0
+      },
+      {
+        "type": "Terminal",
+        "name": "PARENTHESES_RIGHT",
+        "label": "PARENTHESES_RIGHT",
+        "idx": 0,
+        "pattern": ")"
+      }
+    ]
+  },
+  {
+    "type": "Rule",
+    "name": "ParameterExpansion",
+    "orgText": "() => {\n            this.CONSUME(tokens_1.PARAMETER_EXPANSION_LEFT);\n            this.SUBRULE(this.MultipleCommand);\n            this.CONSUME(tokens_1.CURLY_BRACKET_RIGHT);\n        }",
+    "definition": [
+      {
+        "type": "Terminal",
+        "name": "PARAMETER_EXPANSION_LEFT",
+        "label": "PARAMETER_EXPANSION_LEFT",
+        "idx": 0,
+        "pattern": "${"
+      },
+      {
+        "type": "NonTerminal",
+        "name": "MultipleCommand",
+        "idx": 0
+      },
+      {
+        "type": "Terminal",
+        "name": "CURLY_BRACKET_RIGHT",
+        "label": "CURLY_BRACKET_RIGHT",
+        "idx": 0,
+        "pattern": "}"
+      }
+    ]
+  },
+  {
+    "type": "Rule",
+    "name": "BacktickExpression",
+    "orgText": "() => {\n            this.CONSUME(tokens_1.BACKTICK_STRING);\n        }",
+    "definition": [
+      {
+        "type": "Terminal",
+        "name": "BACKTICK_STRING",
+        "label": "BACKTICK_STRING",
+        "idx": 0,
+        "pattern": "([`])((\\\\{2})*|(.*?[^\\\\](\\\\{2})*))\\1"
+      }
+    ]
+  },
+  {
+    "type": "Rule",
+    "name": "CommandSubstitution",
+    "orgText": "() => {\n            this.OR([\n                {\n                    ALT: () => {\n                        this.SUBRULE(this.BacktickExpression);\n                    },\n                },\n                {\n                    ALT: () => {\n                        this.CONSUME(tokens_1.COMMAND_SUBSTITUTION_LEFT);\n                        this.OPTION1(() => {\n                            this.SUBRULE1(this.MultipleCommand);\n                        });\n                        this.CONSUME(tokens_1.PARENTHESES_RIGHT);\n                    },\n                },\n            ]);\n        }",
+    "definition": [
+      {
+        "type": "Alternation",
+        "idx": 0,
+        "definition": [
+          {
+            "type": "Flat",
+            "definition": [
+              {
+                "type": "NonTerminal",
+                "name": "BacktickExpression",
+                "idx": 0
+              }
+            ]
+          },
+          {
+            "type": "Flat",
+            "definition": [
+              {
+                "type": "Terminal",
+                "name": "COMMAND_SUBSTITUTION_LEFT",
+                "label": "COMMAND_SUBSTITUTION_LEFT",
+                "idx": 0,
+                "pattern": "$("
+              },
+              {
+                "type": "Option",
+                "idx": 1,
+                "definition": [
+                  {
+                    "type": "NonTerminal",
+                    "name": "MultipleCommand",
+                    "idx": 1
+                  }
+                ]
+              },
+              {
+                "type": "Terminal",
+                "name": "PARENTHESES_RIGHT",
+                "label": "PARENTHESES_RIGHT",
+                "idx": 0,
+                "pattern": ")"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "type": "Rule",
     "name": "Command",
-    "orgText": "() => {\n            this.AT_LEAST_ONE(() => {\n                this.SUBRULE(this.Literal);\n            });\n            this.OPTION(() => {\n                this.SUBRULE2(this.Redirection);\n            });\n        }",
+    "orgText": "() => {\n            this.AT_LEAST_ONE(() => {\n                this.SUBRULE(this.CommandUnit);\n            });\n            this.OPTION(() => {\n                this.SUBRULE1(this.Redirection);\n            });\n        }",
     "definition": [
       {
         "type": "RepetitionMandatory",
@@ -202,7 +434,7 @@
         "definition": [
           {
             "type": "NonTerminal",
-            "name": "Literal",
+            "name": "CommandUnit",
             "idx": 0
           }
         ]
@@ -214,7 +446,95 @@
           {
             "type": "NonTerminal",
             "name": "Redirection",
-            "idx": 2
+            "idx": 1
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "type": "Rule",
+    "name": "ComposedCommand",
+    "orgText": "() => {\n            this.SUBRULE(this.Command);\n            this.MANY(() => {\n                this.OR([\n                    {\n                        ALT: () => {\n                            this.CONSUME(tokens_1.AND);\n                            this.SUBRULE1(this.Command);\n                        },\n                    },\n                    {\n                        ALT: () => {\n                            this.CONSUME(tokens_1.OR);\n                            this.SUBRULE2(this.Command);\n                        },\n                    },\n                ]);\n            });\n        }",
+    "definition": [
+      {
+        "type": "NonTerminal",
+        "name": "Command",
+        "idx": 0
+      },
+      {
+        "type": "Repetition",
+        "idx": 0,
+        "definition": [
+          {
+            "type": "Alternation",
+            "idx": 0,
+            "definition": [
+              {
+                "type": "Flat",
+                "definition": [
+                  {
+                    "type": "Terminal",
+                    "name": "AND",
+                    "label": "AND",
+                    "idx": 0,
+                    "pattern": "&&"
+                  },
+                  {
+                    "type": "NonTerminal",
+                    "name": "Command",
+                    "idx": 1
+                  }
+                ]
+              },
+              {
+                "type": "Flat",
+                "definition": [
+                  {
+                    "type": "Terminal",
+                    "name": "OR",
+                    "label": "OR",
+                    "idx": 0,
+                    "pattern": "||"
+                  },
+                  {
+                    "type": "NonTerminal",
+                    "name": "Command",
+                    "idx": 2
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "type": "Rule",
+    "name": "Pipeline",
+    "orgText": "() => {\n            this.SUBRULE(this.ComposedCommand);\n            this.MANY(() => {\n                this.CONSUME(tokens_1.PIPE);\n                this.SUBRULE1(this.ComposedCommand);\n            });\n        }",
+    "definition": [
+      {
+        "type": "NonTerminal",
+        "name": "ComposedCommand",
+        "idx": 0
+      },
+      {
+        "type": "Repetition",
+        "idx": 0,
+        "definition": [
+          {
+            "type": "Terminal",
+            "name": "PIPE",
+            "label": "PIPE",
+            "idx": 0,
+            "pattern": "|"
+          },
+          {
+            "type": "NonTerminal",
+            "name": "ComposedCommand",
+            "idx": 1
           }
         ]
       }
@@ -234,7 +554,7 @@
             "name": "IDENTIFIER",
             "label": "IDENTIFIER",
             "idx": 0,
-            "pattern": "[A-Za-z_\\-0-9=\\/.$@~%#\\\\]+"
+            "pattern": "[A-Za-z_\\-0-9=\\/.$@~%#]+"
           }
         ]
       }
@@ -290,7 +610,7 @@
         "name": "IDENTIFIER",
         "label": "IDENTIFIER",
         "idx": 0,
-        "pattern": "[A-Za-z_\\-0-9=\\/.$@~%#\\\\]+"
+        "pattern": "[A-Za-z_\\-0-9=\\/.$@~%#]+"
       }
     ]
   },
@@ -311,40 +631,162 @@
         "name": "IDENTIFIER",
         "label": "IDENTIFIER",
         "idx": 0,
-        "pattern": "[A-Za-z_\\-0-9=\\/.$@~%#\\\\]+"
+        "pattern": "[A-Za-z_\\-0-9=\\/.$@~%#]+"
+      }
+    ]
+  },
+  {
+    "type": "Rule",
+    "name": "IfConditionGroup",
+    "orgText": "() => {\n            this.SUBRULE(this.IfCondition);\n            this.MANY(() => {\n                this.OR([\n                    { ALT: () => this.CONSUME(tokens_1.OR) },\n                    { ALT: () => this.CONSUME(tokens_1.AND) },\n                ]);\n                this.SUBRULE1(this.IfCondition);\n            });\n            this.SUBRULE2(this.Termination);\n        }",
+    "definition": [
+      {
+        "type": "NonTerminal",
+        "name": "IfCondition",
+        "idx": 0
+      },
+      {
+        "type": "Repetition",
+        "idx": 0,
+        "definition": [
+          {
+            "type": "Alternation",
+            "idx": 0,
+            "definition": [
+              {
+                "type": "Flat",
+                "definition": [
+                  {
+                    "type": "Terminal",
+                    "name": "OR",
+                    "label": "OR",
+                    "idx": 0,
+                    "pattern": "||"
+                  }
+                ]
+              },
+              {
+                "type": "Flat",
+                "definition": [
+                  {
+                    "type": "Terminal",
+                    "name": "AND",
+                    "label": "AND",
+                    "idx": 0,
+                    "pattern": "&&"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "NonTerminal",
+            "name": "IfCondition",
+            "idx": 1
+          }
+        ]
+      },
+      {
+        "type": "NonTerminal",
+        "name": "Termination",
+        "idx": 2
       }
     ]
   },
   {
     "type": "Rule",
     "name": "IfCondition",
-    "orgText": "() => {\n            this.CONSUME(tokens_1.SQ_BRAQUET_LEFT);\n            this.CONSUME(tokens_1.IDENTIFIER);\n            this.CONSUME(tokens_1.SQ_BRAQUET_RIGHT);\n            this.SUBRULE(this.Termination);\n        }",
+    "orgText": "() => {\n            this.OR([\n                { ALT: () => this.SUBRULE(this.IfConditionSingleBrackets) },\n                { ALT: () => this.SUBRULE1(this.IfConditionDoubleBrackets) },\n            ]);\n        }",
+    "definition": [
+      {
+        "type": "Alternation",
+        "idx": 0,
+        "definition": [
+          {
+            "type": "Flat",
+            "definition": [
+              {
+                "type": "NonTerminal",
+                "name": "IfConditionSingleBrackets",
+                "idx": 0
+              }
+            ]
+          },
+          {
+            "type": "Flat",
+            "definition": [
+              {
+                "type": "NonTerminal",
+                "name": "IfConditionDoubleBrackets",
+                "idx": 1
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "type": "Rule",
+    "name": "IfConditionSingleBrackets",
+    "orgText": "() => {\n            this.CONSUME(tokens_1.SQ_BRACKET_LEFT);\n            this.AT_LEAST_ONE(() => {\n                this.SUBRULE(this.CommandUnit);\n            });\n            this.CONSUME(tokens_1.SQ_BRACKET_RIGHT);\n        }",
     "definition": [
       {
         "type": "Terminal",
-        "name": "SQ_BRAQUET_LEFT",
-        "label": "SQ_BRAQUET_LEFT",
+        "name": "SQ_BRACKET_LEFT",
+        "label": "SQ_BRACKET_LEFT",
         "idx": 0,
         "pattern": "["
       },
       {
-        "type": "Terminal",
-        "name": "IDENTIFIER",
-        "label": "IDENTIFIER",
+        "type": "RepetitionMandatory",
         "idx": 0,
-        "pattern": "[A-Za-z_\\-0-9=\\/.$@~%#\\\\]+"
+        "definition": [
+          {
+            "type": "NonTerminal",
+            "name": "CommandUnit",
+            "idx": 0
+          }
+        ]
       },
       {
         "type": "Terminal",
-        "name": "SQ_BRAQUET_RIGHT",
-        "label": "SQ_BRAQUET_RIGHT",
+        "name": "SQ_BRACKET_RIGHT",
+        "label": "SQ_BRACKET_RIGHT",
         "idx": 0,
         "pattern": "]"
+      }
+    ]
+  },
+  {
+    "type": "Rule",
+    "name": "IfConditionDoubleBrackets",
+    "orgText": "() => {\n            this.CONSUME(tokens_1.SQ_BRACKET_2_LEFT);\n            this.AT_LEAST_ONE(() => {\n                this.SUBRULE(this.CommandUnit);\n            });\n            this.CONSUME(tokens_1.SQ_BRACKET_2_RIGHT);\n        }",
+    "definition": [
+      {
+        "type": "Terminal",
+        "name": "SQ_BRACKET_2_LEFT",
+        "label": "SQ_BRACKET_2_LEFT",
+        "idx": 0,
+        "pattern": "[["
       },
       {
-        "type": "NonTerminal",
-        "name": "Termination",
-        "idx": 0
+        "type": "RepetitionMandatory",
+        "idx": 0,
+        "definition": [
+          {
+            "type": "NonTerminal",
+            "name": "CommandUnit",
+            "idx": 0
+          }
+        ]
+      },
+      {
+        "type": "Terminal",
+        "name": "SQ_BRACKET_2_RIGHT",
+        "label": "SQ_BRACKET_2_RIGHT",
+        "idx": 0,
+        "pattern": "]]"
       }
     ]
   },
@@ -364,45 +806,8 @@
   },
   {
     "type": "Rule",
-    "name": "Literal",
-    "orgText": "() => {\n            this.OR([\n                { ALT: () => this.CONSUME(tokens_1.STRING) },\n                { ALT: () => this.CONSUME(tokens_1.IDENTIFIER) },\n            ]);\n        }",
-    "definition": [
-      {
-        "type": "Alternation",
-        "idx": 0,
-        "definition": [
-          {
-            "type": "Flat",
-            "definition": [
-              {
-                "type": "Terminal",
-                "name": "STRING",
-                "label": "STRING",
-                "idx": 0,
-                "pattern": "([\"'])((\\\\{2})*|(.*?[^\\\\](\\\\{2})*))\\1"
-              }
-            ]
-          },
-          {
-            "type": "Flat",
-            "definition": [
-              {
-                "type": "Terminal",
-                "name": "IDENTIFIER",
-                "label": "IDENTIFIER",
-                "idx": 0,
-                "pattern": "[A-Za-z_\\-0-9=\\/.$@~%#\\\\]+"
-              }
-            ]
-          }
-        ]
-      }
-    ]
-  },
-  {
-    "type": "Rule",
     "name": "IfExpression",
-    "orgText": "() => {\n            this.CONSUME(tokens_1.IF);\n            this.SUBRULE(this.IfCondition);\n            this.CONSUME(tokens_1.THEN);\n            this.OPTION(() => {\n                this.CONSUME(tokens_1.NEWLINE);\n            });\n            this.SUBRULE(this.MultipleCommandWithTerminator);\n            this.CONSUME(tokens_1.FI);\n        }",
+    "orgText": "() => {\n            this.CONSUME(tokens_1.IF);\n            this.SUBRULE(this.IfConditionGroup);\n            this.CONSUME(tokens_1.THEN);\n            this.OPTION(() => {\n                this.CONSUME(tokens_1.NEWLINE);\n            });\n            this.SUBRULE(this.MultipleCommandWithTerminator);\n            this.CONSUME(tokens_1.FI);\n        }",
     "definition": [
       {
         "type": "Terminal",
@@ -413,7 +818,7 @@
       },
       {
         "type": "NonTerminal",
-        "name": "IfCondition",
+        "name": "IfConditionGroup",
         "idx": 0
       },
       {
@@ -457,4 +862,4 @@
     var diagramsDiv = document.getElementById("diagrams");
     main.drawDiagramsFromSerializedGrammar(serializedGrammar, diagramsDiv);
 </script>
-<div style="color: #777; text-align: right; padding: 0 20px 20px 0; font-family: sans-serif;">Last built on: 11/10/2018</div>
+<div style="color: #777; text-align: right; padding: 0 20px 20px 0; font-family: sans-serif;">Last built on: 13/10/2018</div>

@@ -17,58 +17,67 @@ const getAreLocsOverlapping = (locA, locB) => {
   )
 }
 
-const validateRangesAndLocs = ({ treeResult }) => {
-  const { tokens, comments } = treeResult
+const runCustomFnOnTree = ({ treeResult, traverseFn }) => {
+  walk(treeResult, {
+    enter(...args) {
+      traverseFn(...args)
+    },
+  })
+}
 
-  tokens
-    .concat(comments)
-    .sort((a, b) => {
-      if (typeof a.range[0] === 'undefined') {
-        return 1
-      }
+const validateRangesAndLocsForArr = (arr, allArrays) => {
+  const restItems = allArrays
+    .filter(a => a !== arr)
+    .reduce((acc, a) => a.concat(a), [])
 
-      if (typeof b.range[0] === 'undefined') {
-        return -1
-      }
+  arr.forEach((item, idx) => {
+    const prevItem = arr[idx - 1]
 
-      return a.range[0] - b.range[0]
-    })
-    .forEach((treeItem, idx, arr) => {
-      try {
-        expect(treeItem.range[0] >= 0).toEqual(true)
-        expect(treeItem.range[1] >= 0).toEqual(true)
-        expect(treeItem.range[0] < treeItem.range[1]).toEqual(true)
-        expect(getIsPos1Before2(treeItem.loc.start, treeItem.loc.end)).toEqual(
-          true
+    try {
+      expect(item.range[0] >= 0).toEqual(true)
+      expect(item.range[1] >= 0).toEqual(true)
+      expect(item.range[0] < item.range[1]).toEqual(true)
+      expect(getIsPos1Before2(item.loc.start, item.loc.end)).toEqual(true)
+
+      if (prevItem) {
+        expect(prevItem).not.toBe(item)
+        expect(getIsPos1Before2(item.loc.start, prevItem.loc.end)).toEqual(
+          false
         )
+        expect(prevItem.range[1] <= item.range[0]).toEqual(true)
+      }
+    } catch (e) {
+      // debugger
+      throw e
+    }
+
+    restItems.forEach(otherItem => {
+      //  zzz
+      //       xxxx
+      //             zzz
+      const isRangeNotOverlapping =
+        item.range[0] >= otherItem.range[1] ||
+        item.range[1] <= otherItem.range[0]
+
+      try {
+        expect(item).not.toBe(otherItem)
+        expect(isRangeNotOverlapping).toEqual(true)
+        expect(getAreLocsOverlapping(item.loc, otherItem.loc)).toEqual(false)
       } catch (e) {
         // debugger
         throw e
       }
-
-      arr.forEach(otherItem => {
-        if (treeItem === otherItem) {
-          return
-        }
-
-        //  zzz
-        //       xxxx
-        //             zzz
-        const isRangeNotOverlapping =
-          treeItem.range[0] >= otherItem.range[1] ||
-          treeItem.range[1] <= otherItem.range[0]
-
-        try {
-          expect(isRangeNotOverlapping).toEqual(true)
-          expect(getAreLocsOverlapping(treeItem.loc, otherItem.loc)).toEqual(
-            false
-          )
-        } catch (e) {
-          // debugger
-          throw e
-        }
-      })
     })
+  })
+}
+
+const validateRangesAndLocs = ({ treeResult }) => {
+  const { tokens, comments } = treeResult
+
+  const allArrays = [tokens, comments]
+
+  validateRangesAndLocsForArr(tokens, allArrays)
+  validateRangesAndLocsForArr(comments, allArrays)
 }
 
 const writeDebugFile = (filename, value) => {
@@ -122,74 +131,98 @@ export default (
     throws = false,
     errorsCheck = false,
     containsComments = null,
-    containedNodes = [],
+    containingNodes = [],
     missingNodes = [],
-    containedTokens = [],
+    containingTokens = [],
     missingTokens = [],
-  } = {}
+    traverseFn = (...args) => args,
+  }: any = {}
 ) => {
-  if (throws) {
-    expect(() => (parse as any)(text)).toThrow()
-    expect(() => buildESTreeAstFromSource(text)).toThrow()
-  } else {
-    const fn = () => {
-      const { value, lexErrors, parseErrors, parser } = parse(text)
+  let isExpectedThrow = false
 
-      if (debug) {
-        writeDebugFile('parser-result', value)
-      }
-
-      expect(lexErrors.length).toEqual(0)
-      expect(parseErrors.length).toEqual(0)
-
-      const visitor = getESTreeConverterVisitor({ parser })
-
-      const treeResult = visitor.visit(value)
-
-      if (debug) {
-        writeDebugFile('visitor-result', treeResult)
-      }
-
-      const getNodeVisited = getNodeVisitedFn({ value, treeResult })
-
-      containedNodes.forEach(nodeName => {
-        expect(getNodeVisited(nodeName)).toEqual(true)
-      })
-
-      missingNodes.forEach(nodeName => {
-        expect(getNodeVisited(nodeName)).toEqual(false)
-      })
-
-      const getTokenExisting = getTokenExistingFn({ treeResult })
-      const getContainsComments = getContainsCommentsFn({ treeResult })
-
-      containedTokens.forEach(token => {
-        expect(getTokenExisting(token)).toEqual(true)
-      })
-
-      missingTokens.forEach(token => {
-        expect(getTokenExisting(token)).toEqual(false)
-      })
-
-      if (typeof containsComments === 'boolean') {
-        expect(getContainsComments()).toEqual(containsComments)
-      }
-
-      validateRangesAndLocs({ treeResult })
-    }
+  const checkingFn = () => {
+    let value
+    let lexErrors
+    let parseErrors
+    let parser
 
     try {
-      expect(fn).not.toThrow()
+      // tslint:disable-next-line
+      isExpectedThrow = true
+      ;({ value, lexErrors, parseErrors, parser } = parse(text))
     } catch (e) {
-      if (!errorsCheck) {
-        throw e
-      }
-
-      return
+      // debugger
+      throw e
     }
 
-    if (errorsCheck) {
-      throw new Error('no errors on checks')
+    isExpectedThrow = false
+
+    if (debug) {
+      writeDebugFile('parser-result', value)
     }
+
+    isExpectedThrow = true
+
+    expect(lexErrors.length).toEqual(0)
+    expect(parseErrors.length).toEqual(0)
+
+    const visitor = getESTreeConverterVisitor({ parser })
+
+    const treeResult = visitor.visit(value)
+
+    isExpectedThrow = false
+
+    if (debug) {
+      writeDebugFile('visitor-result', treeResult)
+    }
+
+    const getNodeVisited = getNodeVisitedFn({ value, treeResult })
+
+    containingNodes.forEach(nodeName => {
+      expect(getNodeVisited(nodeName)).toEqual(true)
+    })
+
+    missingNodes.forEach(nodeName => {
+      expect(getNodeVisited(nodeName)).toEqual(false)
+    })
+
+    const getTokenExisting = getTokenExistingFn({ treeResult })
+    const getContainsComments = getContainsCommentsFn({ treeResult })
+
+    containingTokens.forEach(token => {
+      expect(getTokenExisting(token)).toEqual(true)
+    })
+
+    missingTokens.forEach(token => {
+      expect(getTokenExisting(token)).toEqual(false)
+    })
+
+    if (typeof containsComments === 'boolean') {
+      expect(getContainsComments()).toEqual(containsComments)
+    }
+
+    validateRangesAndLocs({ treeResult })
+
+    runCustomFnOnTree({ treeResult, traverseFn })
+  }
+
+  try {
+    if (throws) {
+      expect(checkingFn).toThrow()
+      expect(isExpectedThrow).toEqual(true)
+    } else {
+      expect(checkingFn).not.toThrow()
+    }
+  } catch (e) {
+    if (!errorsCheck) {
+      // debugger
+      throw e
+    }
+
+    return
+  }
+
+  if (errorsCheck) {
+    throw new Error('no errors on checks')
   }
 }

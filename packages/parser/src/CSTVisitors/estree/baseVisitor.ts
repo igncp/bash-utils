@@ -2,17 +2,7 @@ import { EOF } from 'chevrotain'
 
 import * as allTokens from '../../tokens'
 
-const sortByRange = (a, b) => {
-  if (typeof a.range[0] === 'undefined') {
-    return 1
-  }
-
-  if (typeof b.range[0] === 'undefined') {
-    return -1
-  }
-
-  return a.range[0] - b.range[0]
-}
+import { sortByRange } from './treeHelpers'
 
 const parseToken = item => {
   if (item.tokenType === EOF) {
@@ -141,6 +131,38 @@ const transformChildrenTo = ({ type, key, ctx, visitor }) => {
   }
 }
 
+const baseVisitorKeysWithBody = [
+  'BacktickExpression',
+  'Command',
+  'CommandSubstitution',
+  'CommandUnit',
+  'Comment',
+  'ComposedCommand',
+  'IfCondition',
+  'IfConditionDoubleBrackets',
+  'IfConditionGroup',
+  'IfConditionSingleBrackets',
+  'IfExpression',
+  'Literal',
+  'MultipleCommand',
+  'MultipleCommandWithTerminator',
+  'ParameterExpansion',
+  'Pipeline',
+  'ProcessSubstitution',
+  'Program',
+  'Redirection',
+  'RedirectionA',
+  'RedirectionB',
+  'Termination',
+]
+
+export const baseVisitorKeysObj = baseVisitorKeysWithBody.reduce((acc, key) => {
+  return {
+    acc,
+    [key]: ['body'],
+  }
+}, {})
+
 export const getBaseVisitor = ({ parser }) => {
   const BaseSQLVisitorWithDefaults = parser.getBaseCstVisitorConstructorWithDefaults()
 
@@ -152,20 +174,8 @@ export const getBaseVisitor = ({ parser }) => {
 
       this.comments = []
       this.tokens = []
-      ;[
-        'Assignment',
-        'Command',
-        'Comment',
-        'IfCondition',
-        'IfExpression',
-        'Literal',
-        'MultipleCommand',
-        'MultipleCommandWithTerminator',
-        'Redirection',
-        'RedirectionA',
-        'RedirectionB',
-        'Termination',
-      ].forEach(type => {
+
+      baseVisitorKeysWithBody.filter(key => key !== 'Program').forEach(type => {
         this[type] = ctx => {
           const key = 'body'
 

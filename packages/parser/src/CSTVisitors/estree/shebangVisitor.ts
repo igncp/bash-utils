@@ -55,7 +55,7 @@ const visitAstToCreateShebang = tree => {
           replaceItemInParent(item, newItem)
 
           item.parent = newItem
-          item.parentKey = newItem
+          item.parentKey = 'body'
 
           throw new Error('exit')
         }
@@ -73,4 +73,8 @@ export const getShebangVisitor = () => {
       return visitAstToCreateShebang(tree)
     },
   }
+}
+
+export const shebangVisitorKeysObj = {
+  Shebang: ['body'],
 }

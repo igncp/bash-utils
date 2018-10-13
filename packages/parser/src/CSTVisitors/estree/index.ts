@@ -1,48 +1,45 @@
-import { getAssignmentsVisitor } from './assignmentsVisitor'
-import { getBaseVisitor } from './baseVisitor'
+import {
+  assignmentsVisitorKeysObj,
+  getAssignmentsVisitor,
+} from './assignmentsVisitor'
+import { getBacktickVisitor } from './backtickVisitor'
+import { baseVisitorKeysObj, getBaseVisitor } from './baseVisitor'
+import { getIfConditionsVisitor } from './ifConditionsVisitor'
 import { getRemoveParentVistor } from './removeParentVisitor'
-import { getShebangVisitor } from './shebangVisitor'
+import { getShebangVisitor, shebangVisitorKeysObj } from './shebangVisitor'
 
 const VISITORS_FACTORIES = [
   getBaseVisitor,
+  getBacktickVisitor,
   getShebangVisitor,
   getAssignmentsVisitor,
-  getRemoveParentVistor, // this should be the last
+  getIfConditionsVisitor,
 ]
 
-export const getESTreeConverterVisitor = ({ parser }) => {
-  const visitors = VISITORS_FACTORIES.map(f => {
+const visitAllRecursive = ({ parser, parserResult }) => {
+  const visitors = VISITORS_FACTORIES.map((f: any) => {
     return f({ parser })
   })
 
+  return visitors.reduce((tree, visitor) => {
+    return visitor.visit(tree, visitAllRecursive)
+  }, parserResult)
+}
+
+export const getESTreeConverterVisitor = ({ parser }) => {
   return {
     visit(parserResult) {
-      return visitors.reduce((tree, visitor) => {
-        return visitor.visit(tree)
-      }, parserResult)
+      const treeWithParents = visitAllRecursive({ parser, parserResult })
+
+      // this should only be applied in the final tree
+      return getRemoveParentVistor().visit(treeWithParents)
     },
   }
 }
 
-const visitorKeysWithBody = [
-  'Assignment',
-  'Command',
-  'IfCondition',
-  'IfExpression',
-  'MultipleCommand',
-  'Program',
-  'Redirection',
-  'RedirectionA',
-  'RedirectionB',
-  'Shebang',
-].reduce((acc, key) => {
-  return {
-    acc,
-    [key]: ['body'],
-  }
-}, {})
-
 // exposed visitor keys after applying all visitors
 export const visitorKeys = {
-  ...visitorKeysWithBody,
+  ...baseVisitorKeysObj,
+  ...assignmentsVisitorKeysObj,
+  ...shebangVisitorKeysObj,
 }
