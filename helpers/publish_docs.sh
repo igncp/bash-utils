@@ -15,3 +15,5 @@ cp -r packages/parser/diagrams/generated_diagrams.html docs/grammar.html
 git add -A docs
 
 (BASH_UTILS_ALLOW_DOCS=true git commit -m 'docs: publish release docs')
+
+git push origin master
