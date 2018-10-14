@@ -2,6 +2,7 @@ import { EOF, Lexer as ChevLexer, Parser as ChevParser } from 'chevrotain'
 
 import {
   ALL_TOKENS,
+  AMPERSAND,
   AND,
   BACKTICK_STRING,
   COMMAND_SUBSTITUTION_LEFT,
@@ -146,6 +147,10 @@ export class Parser extends ChevParser {
     })
 
     this.OPTION(() => {
+      this.CONSUME(AMPERSAND)
+    })
+
+    this.OPTION1(() => {
       this.SUBRULE1(this.Redirection)
     })
   })

@@ -2,7 +2,7 @@ import { createToken, Lexer } from 'chevrotain'
 
 export const IDENTIFIER = createToken({
   name: 'IDENTIFIER',
-  pattern: /[A-Za-z_\-0-9=\/.$@~%#]+/,
+  pattern: /[A-Za-z_\-0-9=\/.$@~%\]\[#]+/,
 })
 export const TERMINATOR = createToken({ name: 'TERMINATOR', pattern: Lexer.NA })
 
@@ -114,6 +114,10 @@ export const AND = createToken({
   name: 'AND',
   pattern: '&&',
 })
+export const AMPERSAND = createToken({
+  name: 'AMPERSAND',
+  pattern: '&',
+})
 
 const WHITESPACE = createToken({
   group: Lexer.SKIPPED,
@@ -168,6 +172,7 @@ export const ALL_TOKENS = [
   SQ_BRACKET_LEFT,
   SQ_BRACKET_RIGHT,
   BACKTICK,
+  AMPERSAND,
 
   // last
   IDENTIFIER,

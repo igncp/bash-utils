@@ -18,6 +18,10 @@ describe('parse errors', () => {
     check('"$((foo"', { throws: false })
   })
 
+  test('grouping commands', () => {
+    check('{ echo foo; cat bar.txt }', { throws: true })
+  })
+
   test('redirections', () => {
     check('foo >>', { throws: true })
   })
@@ -27,6 +31,7 @@ describe('parse errors', () => {
     check('if [ true ]; then; echo; fi', { throws: true })
     check('if [ foo bar ]; then bar; fi', { throws: true })
     check('if [ -z -z bar ]; then bar; fi', { throws: true })
+    check('if [ -z bar]; then bar; fi', { throws: true })
     check('if [ -z ]; then bar; fi', { throws: true })
   })
 
@@ -57,6 +62,7 @@ describe('parse errors', () => {
     check('echo foo(', { throws: true })
     check('echo foo()', { throws: true })
     check('echo foo)', { throws: true })
+    check('echo & &', { throws: true })
   })
 
   test('pipelines', () => {
@@ -68,11 +74,27 @@ describe('non parse errors', () => {
   test('KNOWN ISSUES - should not error but error', () => {
     check('echo foo\\(', { throws: true })
     check('echo \\(\\)', { throws: true })
-    check('echo &', { throws: true })
+    check('( echo foo; cat bar.txt )', { throws: true })
+    check('{ echo foo; cat bar.txt; }', { throws: true })
     check('select fname in foo; do echo $fname; done', {
       containingNodes: ['SelectExpression'],
       errorsCheck: true,
     })
+    check(
+      `
+case $FOO in
+[1-6]*)
+  BAR="FOO"
+  ;;
+[7-8]*)
+  BAR="BAR"
+  ;;
+*)
+  BAR="BAZ"
+  ;;
+esac`,
+      { throws: true }
+    )
   })
 
   test('strings', () => {
@@ -126,7 +148,6 @@ describe('non parse errors', () => {
     })
     check('foo # bar $(( "', {
       containingNodes: ['Comment', 'Command'],
-      missingNodes: [],
     })
   })
 
@@ -147,6 +168,7 @@ describe('non parse errors', () => {
     check('foo-bar')
     check('foo_bar baz bam')
     check('set -e')
+    check('echo &')
   })
 
   test('redirections', () => {
@@ -210,9 +232,9 @@ describe('non parse errors', () => {
 
   test('if expressions', () => {
     check('if [ foo ]; then bar; fi')
-    check('if [ foo ] || [ bar]; then echo foo; fi')
-    check('if [ foo ] && [ bar]; then echo foo; fi')
-    check('if [ foo ] && [[ bar]]; then echo foo; fi')
+    check('if [ foo ] || [ bar ]; then echo foo; fi')
+    check('if [ foo ] && [ bar ]; then echo foo; fi')
+    check('if [ foo ] && [[ bar ]]; then echo foo; fi')
     check('if [ -z foo ]; then bar; fi', {
       containingNodes: ['IfConditionSingleBrackets'],
     })
@@ -243,6 +265,7 @@ describe('non parse errors', () => {
       /tmp/bar`,
       {
         traverseFn: item => {
+          // confirm it is not considering \ as identifier
           if (item.type === tokens.IDENTIFIER.tokenName) {
             expect(item.value !== 'echo' || item.value !== '/tmp/bar').toEqual(
               true

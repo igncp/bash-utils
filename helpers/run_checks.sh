@@ -3,6 +3,6 @@
 set -e
 
 find helpers/checks -type f | \
-  xargs -I {} sh {}
+  xargs -I {} bash {}
 
 ./node_modules/.bin/lerna run run-checks

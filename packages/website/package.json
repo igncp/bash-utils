@@ -1,0 +1,25 @@
+{
+  "name": "@bash-utils/website",
+  "version": "0.0.2",
+  "private": true,
+  "homepage": "https://igncp.github.io/bash-utils",
+  "dependencies": {
+    "@bash-utils/parser": "^0.0.2",
+    "react": "^16.5.2",
+    "react-dom": "^16.5.2",
+    "react-json-tree": "^0.11.0",
+    "react-scripts": "2.0.4"
+  },
+  "scripts": {
+    "docs": "react-scripts build",
+    "eject": "react-scripts eject",
+    "run-checks": "find helpers/checks -type f | xargs -I {} bash {}",
+    "start": "react-scripts start"
+  },
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
+  ]
+}

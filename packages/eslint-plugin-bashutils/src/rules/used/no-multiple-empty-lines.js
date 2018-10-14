@@ -1,7 +1,26 @@
 // @flow
 
 /**
- * Disallows adding more than one empty lines
+ * Disallows adding more than one empty line
+ *
+ * ### Valid
+ *
+ * ```sh
+ * echo foo
+ *
+ * echo bar
+ * ```
+ *
+ * ### Invalid
+ *
+ * ```sh
+ * echo foo
+ *
+ *
+ * echo bar
+ * ```
+ *
+ * @module No multiple empty lines
  */
 
 import { tokens as availableTokens } from '@bash-utils/parser'

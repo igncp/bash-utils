@@ -8,6 +8,16 @@ eval "./node_modules/.bin/prettier --list-different $PRETTIER_FILES"
 
 ./node_modules/.bin/eslint .
 
+UNUSED_RULES=$(npm run eslint-find-rules | grep . | head)
+
+if [ -n "$UNUSED_RULES" ]; then
+  echo "$UNUSED_RULES"
+  echo ""
+  echo "^^^ There are some ESLint unused rules (printing here max 10)"
+  echo "Can disable them or add them"
+  echo ""
+fi
+
 ./node_modules/.bin/flow .
 
 ./node_modules/.bin/lerna run lint
