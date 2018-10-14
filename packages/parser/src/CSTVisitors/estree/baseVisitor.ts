@@ -109,7 +109,7 @@ const convertASTObjectIntoSortedArray = (ctx, visitor) => {
 
       return acc
     }, [])
-    .sort()
+    .sort(sortByRange)
 }
 
 const getNodeParsedProperties = (ctx, visitor) => {

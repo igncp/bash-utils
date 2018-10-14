@@ -25,13 +25,17 @@ const runCustomFnOnTree = ({ treeResult, traverseFn }) => {
   })
 }
 
-const validateRangesAndLocsForArr = (arr, allArrays) => {
+const validateRangesAndLocsForArr = (arr, allArrays = []) => {
   const restItems = allArrays
     .filter(a => a !== arr)
     .reduce((acc, a) => a.concat(a), [])
 
   arr.forEach((item, idx) => {
     const prevItem = arr[idx - 1]
+
+    if (item.type === 'EOF') {
+      return
+    }
 
     try {
       expect(item.range[0] >= 0).toEqual(true)
@@ -78,6 +82,14 @@ const validateRangesAndLocs = ({ treeResult }) => {
 
   validateRangesAndLocsForArr(tokens, allArrays)
   validateRangesAndLocsForArr(comments, allArrays)
+
+  walk(treeResult, {
+    enter(item) {
+      if (item.body) {
+        validateRangesAndLocsForArr(item.body)
+      }
+    },
+  })
 }
 
 const writeDebugFile = (filename, value) => {
