@@ -1,6 +1,7 @@
 !.eslintrc.js
 docs
 node_modules
+flow-coverage
 lib
 !.babelrc.js
 packages/eslint-plugin-bashutils/tests/integration

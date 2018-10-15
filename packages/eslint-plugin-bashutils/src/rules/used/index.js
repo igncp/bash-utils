@@ -3,7 +3,9 @@
 import requireShebang from './require-shebang'
 import noMultipleEmptyLines from './no-multiple-empty-lines'
 
-export default {
+const rules = {
   'no-multiple-empty-lines': noMultipleEmptyLines,
   'require-shebang': requireShebang,
 }
+
+export default rules

@@ -6,7 +6,7 @@ REAL_PACKAGES=$(find packages -maxdepth 1 -mindepth 1 -type d |
   sed 's|packages/||' |
   sort -V)
 
-README_PACKAGES=$(perl -0 -ne '/(Packages:.+)##/s && print "$1\n"' README.md |
+README_PACKAGES=$(perl -0 -ne '/(Packages:.+?)##/s && print "$1\n"' README.md |
   tail -n +2 |
   grep . |
   sed -e 's|- \[\(.*\)\].*|\1|')

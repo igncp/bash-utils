@@ -1,4 +1,8 @@
-export default {
+// @flow
+
+import { type T_Rule } from '../../types'
+
+const rule: T_Rule = {
   meta: {
     docs: {
       description: 'This rule disallows variable assignment',
@@ -15,3 +19,5 @@ export default {
     }
   },
 }
+
+export default rule

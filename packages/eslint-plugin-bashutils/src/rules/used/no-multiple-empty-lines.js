@@ -25,23 +25,23 @@
 
 import { tokens as availableTokens } from '@bash-utils/parser'
 
-import type { T_Context, T_Node } from '../../types'
+import { type T_Rule } from '../../types'
 
 // @TODO:
 // - Option to configure the number of lines
 // - Discard empty lines inside strings (configurable)
 
-export default {
+const rule: T_Rule = {
   meta: {
     docs: {
       description: 'Disallow consecutive empty lines',
     },
   },
-  create(ctx: T_Context) {
+  create(ctx) {
     const sourceCode = ctx.getSourceCode()
 
     return {
-      Program(node: T_Node) {
+      Program(node) {
         const tokens = sourceCode.getTokens(node)
         const newLineTokens = tokens.filter(
           t => t.type === availableTokens.NEWLINE.tokenName
@@ -59,3 +59,5 @@ export default {
     }
   },
 }
+
+export default rule

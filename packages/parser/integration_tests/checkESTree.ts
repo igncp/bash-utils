@@ -94,14 +94,14 @@ const validateRangesAndLocs = ({ treeResult }) => {
 
 const writeDebugFile = (filename, value) => {
   writeFileSync(
-    __dirname + '/../debug/' + filename + '.json',
+    `${__dirname}/../debug/${filename}.json`,
     JSON.stringify(value, null, 2)
   )
 }
 
 const getNodeVisitedFn = ({ value, treeResult }) => nodeName => {
   if (!nodeName) {
-    throw new Error('Invalid nodeName: ' + nodeName)
+    throw new Error(`Invalid nodeName: ${nodeName}`)
   }
 
   let visited = false

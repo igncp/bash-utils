@@ -1,10 +1,10 @@
 // @flow
 
-import type { T_Context } from '../../types'
+import { type T_Context } from '../../types'
 
 const SHOULD_REPORT_DUMMY = false
 
-export default {
+const rule = {
   create(ctx: T_Context) {
     if (SHOULD_REPORT_DUMMY) {
       ctx.report({
@@ -20,3 +20,5 @@ export default {
     }
   },
 }
+
+export default rule

@@ -9,7 +9,7 @@ if [ -z "$(grep -o 'const DEFAULT_CONTENT = `' src/App.js)" ]; then
 fi
 
 WEBSITE_DEFAULT_CONTENT=$(\
-  perl -0 -ne '/(const DEFAULT_CONTENT = .+)`.trim\(\)/s && print "$1\n"' src/App.js | \
+  perl -0 -ne '/(const DEFAULT_CONTENT = .+?)`.trim\(\)/s && print "$1\n"' src/App.js | \
   tail -n +2)
 
 FILE_DEFAULT_CONTENT=$(cat ../parser/integration_tests/fixture_files/website_default_content.sh)

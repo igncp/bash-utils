@@ -12,7 +12,7 @@ const ruleTester = new RuleTester({
 
 const parser = path.resolve(path.join(__dirname, '../src'))
 
-export const runTest = (ruleName, rule, tests) => {
+const runTest = (ruleName, rule, tests) => {
   describe(ruleName, () => {
     test('meta', () => {
       expect(rule.meta).toBeTruthy()
@@ -29,7 +29,9 @@ runTest.skip = ruleName => {
   describe.skip(ruleName)
 }
 
-export const ruleTestMapper = opts => ({
+const ruleTestMapper = opts => ({
   ...opts,
   parser,
 })
+
+export { runTest, ruleTestMapper }

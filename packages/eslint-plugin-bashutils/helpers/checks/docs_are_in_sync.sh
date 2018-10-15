@@ -7,7 +7,7 @@ USED_RULES=$(find src/rules/used/ -maxdepth 1 -mindepth 1 -type f |
   sed 's|src/rules/used/||; s|.js$||' |
   sort -V)
 
-README_RULES=$(perl -0 -ne '/(## Rules.+)##/s && print "$1\n"' README.md |
+README_RULES=$(perl -0 -ne '/(## Rules.+?)##/s && print "$1\n"' README.md |
   head -n -2 |
   tail -n +3 |
   sed -e 's|- \[\*\*\(.*\)\*\*\](.*):.*$|\1|')

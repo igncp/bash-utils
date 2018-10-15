@@ -74,6 +74,14 @@ export const PARENTHESES_RIGHT = createToken({
   name: 'PARENTHESES_RIGHT',
   pattern: ')',
 })
+export const PARENTHESES_LEFT = createToken({
+  name: 'PARENTHESES_LEFT',
+  pattern: '(',
+})
+export const CURLY_BRACKET_LEFT = createToken({
+  name: 'CURLY_BRACKET_LEFT',
+  pattern: '{',
+})
 export const CURLY_BRACKET_RIGHT = createToken({
   name: 'CURLY_BRACKET_RIGHT',
   pattern: '}',
@@ -171,6 +179,8 @@ export const ALL_TOKENS = [
   SQ_BRACKET_2_RIGHT,
   SQ_BRACKET_LEFT,
   SQ_BRACKET_RIGHT,
+  PARENTHESES_LEFT,
+  CURLY_BRACKET_LEFT,
   BACKTICK,
   AMPERSAND,
 

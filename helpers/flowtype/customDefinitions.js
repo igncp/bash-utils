@@ -7,3 +7,7 @@ declare module '@bash-utils/parser' {
   declare var visitorKeysForESTree: any
   declare var buildESTreeAstFromSource: any
 }
+
+declare module 'react-json-tree' {
+  declare export default any
+}

@@ -1,3 +1,5 @@
+import { walk } from './walker'
+
 export const replaceItemInParent = (item, newItem) => {
   const { parent, parentKey } = item
 
@@ -72,4 +74,25 @@ export const sortByRange = (a, b) => {
   }
 
   return a.range[0] - b.range[0]
+}
+
+export const updatePositions = (item, baseRange, basePos) => {
+  walk(item, {
+    enter(subItem) {
+      if (!subItem.range) {
+        return
+      }
+
+      subItem.range[0] += baseRange[0]
+      subItem.range[1] += baseRange[0]
+
+      if (subItem.loc.start.line === 0) {
+        subItem.loc.start.column += basePos.column
+        subItem.loc.end.column += basePos.column
+      }
+
+      subItem.loc.start.line += basePos.line
+      subItem.loc.end.line += basePos.line
+    },
+  })
 }

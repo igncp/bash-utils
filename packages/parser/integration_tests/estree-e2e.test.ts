@@ -18,7 +18,8 @@ describe('parse errors', () => {
     check('"$((foo"', { throws: false })
   })
 
-  test('grouping commands', () => {
+  test('pipeline blocks', () => {
+    check('( echo foo; cat bar.txt; ( )', { throws: true })
     check('{ echo foo; cat bar.txt }', { throws: true })
   })
 
@@ -74,8 +75,6 @@ describe('non parse errors', () => {
   test('KNOWN ISSUES - should not error but error', () => {
     check('echo foo\\(', { throws: true })
     check('echo \\(\\)', { throws: true })
-    check('( echo foo; cat bar.txt )', { throws: true })
-    check('{ echo foo; cat bar.txt; }', { throws: true })
     check('select fname in foo; do echo $fname; done', {
       containingNodes: ['SelectExpression'],
       errorsCheck: true,
@@ -116,6 +115,10 @@ esac`,
     })
   })
 
+  test('strings interpolation', () => {
+    check('echo "$(foo | bar)"', { containingTokens: [tokens.PIPE] })
+  })
+
   test('shebang', () => {
     check('#!/usr/bin/env bash', {
       containingNodes: ['Shebang'],
@@ -139,6 +142,12 @@ esac`,
         missingNodes: ['Shebang'],
       }
     )
+  })
+
+  test('pipeline blocks', () => {
+    check('( echo foo; cat bar.txt )', { containingNodes: ['SubShell'] })
+    check('( echo foo; cat bar.txt; )', { containingNodes: ['SubShell'] })
+    check('{ echo foo; cat bar.txt; }', { containingNodes: ['CommandsGroup'] })
   })
 
   test('comments', () => {
@@ -277,14 +286,15 @@ esac`,
   })
 
   test('files', done => {
-    const filesPath = __dirname + '/fixture_files'
+    const filesPath = `${__dirname}/fixture_files`
+
     readdir(filesPath, (err, files) => {
       if (err) {
         throw err
       }
 
       files.forEach(fileName => {
-        const fileContent = readFileSync(filesPath + '/' + fileName, 'utf-8')
+        const fileContent = readFileSync(`${filesPath}/${fileName}`, 'utf-8')
 
         expect(typeof fileContent).toEqual('string')
 

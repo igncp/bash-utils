@@ -65,7 +65,7 @@ const parseNode = (node, visitor) => {
 
   if (!visitedNode) {
     throw new Error(
-      'Undefined visited node returned for ' + JSON.stringify(node)
+      `Undefined visited node returned for ${JSON.stringify(node)}`
     )
   }
 
@@ -136,6 +136,7 @@ const baseVisitorKeysWithBody = [
   'Command',
   'CommandSubstitution',
   'CommandUnit',
+  'CommandsGroup',
   'Comment',
   'ComposedCommand',
   'IfCondition',
@@ -148,11 +149,13 @@ const baseVisitorKeysWithBody = [
   'MultipleCommandWithTerminator',
   'ParameterExpansion',
   'Pipeline',
+  'PipelineBlock',
   'ProcessSubstitution',
   'Program',
   'Redirection',
   'RedirectionA',
   'RedirectionB',
+  'SubShell',
   'Termination',
 ]
 

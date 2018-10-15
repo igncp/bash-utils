@@ -1,3 +1,5 @@
+// @flow
+
 import JSONTree from 'react-json-tree'
 import React, { Component } from 'react'
 import { buildESTreeAstFromSource } from '@bash-utils/parser'
@@ -13,7 +15,14 @@ const DEFAULT_CONTENT = `
 echo foo
 `.trim()
 
-class App extends Component {
+type T_Props = {||}
+
+type T_State = {|
+  bashInputValue: string,
+  estreeOutputValue: string,
+|}
+
+class App extends Component<T_Props, T_State> {
   state = {
     bashInputValue: '',
     estreeOutputValue: '',
@@ -23,7 +32,7 @@ class App extends Component {
     this.updateBoxes(DEFAULT_CONTENT)
   }
 
-  updateBoxes(bashInputValue) {
+  updateBoxes(bashInputValue: string) {
     let estreeOutputValue = 'PARSING FAILED'
 
     try {
@@ -36,8 +45,8 @@ class App extends Component {
     })
   }
 
-  handleBashInputChange = ev => {
-    this.updateBoxes(ev.target.value)
+  handleBashInputChange = (ev: SyntheticEvent<HTMLTextAreaElement>) => {
+    this.updateBoxes(ev.currentTarget.value)
   }
 
   render() {
@@ -70,6 +79,7 @@ class App extends Component {
           <a className="grammar-link" href="grammar">
             {'Parser Grammar'}
           </a>
+          <span>{'. '}</span>
           <a
             className="grammar-link"
             href="https://github.com/igncp/bash-utils/tree/master/packages/eslint-plugin-bashutils"
@@ -96,6 +106,11 @@ class App extends Component {
         <div className="json-tree-wrapper">
           <JSONTree data={this.state.estreeOutputValue} theme={jsonTreeTheme} />
         </div>
+        <footer target="_blank">
+          <a href="https://github.com/igncp/bash-utils/tree/master/packages/website">
+            {'Source'}
+          </a>
+        </footer>
       </div>
     )
   }

@@ -1,4 +1,6 @@
-export default {
+// @flow
+
+const theme = {
   scheme: 'paraiso',
   author: 'jan t. sott',
   base00: '#2f1e2e',
@@ -18,3 +20,5 @@ export default {
   base0E: '#815ba4',
   base0F: '#e96ba8',
 }
+
+export default theme

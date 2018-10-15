@@ -1,29 +1,12 @@
 import { parse } from '../../parse'
 import * as allTokens from '../../tokens'
 
-import { replaceItemInParent, sortByRange } from './treeHelpers'
+import {
+  replaceItemInParent,
+  sortByRange,
+  updatePositions,
+} from './treeHelpers'
 import { walk } from './walker'
-
-const updatePositions = (item, baseRange, basePos) => {
-  walk(item, {
-    enter(subItem) {
-      if (!subItem.range) {
-        return
-      }
-
-      subItem.range[0] += baseRange[0]
-      subItem.range[1] += baseRange[0]
-
-      if (subItem.loc.line === 0) {
-        subItem.loc.start.column += basePos.column
-        subItem.loc.end.column += basePos.column
-      }
-
-      subItem.loc.start.line += basePos.line
-      subItem.loc.end.line += basePos.line
-    },
-  })
-}
 
 const visitTreeToParseBackticks = (tree, visitAllRecursive) => {
   const newTokensToAdd = []

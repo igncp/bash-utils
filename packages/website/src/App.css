@@ -32,3 +32,8 @@
   margin: 20px 0 10px;
   overflow: auto;
 }
+
+footer {
+  text-align: center;
+  margin: 20px 0;
+}

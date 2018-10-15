@@ -7,10 +7,12 @@ import { baseVisitorKeysObj, getBaseVisitor } from './baseVisitor'
 import { getIfConditionsVisitor } from './ifConditionsVisitor'
 import { getRemoveParentVistor } from './removeParentVisitor'
 import { getShebangVisitor, shebangVisitorKeysObj } from './shebangVisitor'
+import { getStringsVisitor } from './stringsVisitor'
 
 const VISITORS_FACTORIES = [
   getBaseVisitor,
   getBacktickVisitor,
+  getStringsVisitor,
   getShebangVisitor,
   getAssignmentsVisitor,
   getIfConditionsVisitor,

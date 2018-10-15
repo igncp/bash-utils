@@ -40,6 +40,7 @@
     "eslint-plugin-prettier": "^3.0.0",
     "eslint-plugin-react": "^7.11.1",
     "flow-bin": "^0.81.0",
+    "flow-coverage-report": "^0.6.0",
     "husky": "^1.0.0-rc.14",
     "jest": "^23.6.0",
     "lerna": "^3.4.0",
@@ -57,5 +58,21 @@
     "semi": false,
     "singleQuote": true,
     "trailingComma": "es5"
+  },
+  "flow-coverage-report": {
+    "globExcludePatterns": [
+      "**/node_modules/**",
+      "**/docs/**",
+      "**/build/**",
+      "**/__tests__/**"
+    ],
+    "flowCommandPath": "./node_modules/.bin/flow",
+    "globIncludePatterns": [
+      "packages/**/src/**/*.js"
+    ],
+    "threshold": 70,
+    "reportTypes": [
+      "html"
+    ]
   }
 }

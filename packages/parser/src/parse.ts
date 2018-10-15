@@ -7,6 +7,7 @@ import {
   BACKTICK_STRING,
   COMMAND_SUBSTITUTION_LEFT,
   COMMENT,
+  CURLY_BRACKET_LEFT,
   CURLY_BRACKET_RIGHT,
   FI,
   IDENTIFIER,
@@ -14,6 +15,7 @@ import {
   NEWLINE,
   OR,
   PARAMETER_EXPANSION_LEFT,
+  PARENTHESES_LEFT,
   PARENTHESES_RIGHT,
   PIPE,
   PROCESS_SUBSTITUTION_GT_LEFT,
@@ -176,12 +178,36 @@ export class Parser extends ChevParser {
     })
   })
 
+  protected PipelineBlock = this.RULE('PipelineBlock', () => {
+    this.OR([
+      { ALT: () => this.SUBRULE(this.ComposedCommand) },
+      { ALT: () => this.SUBRULE(this.SubShell) },
+      { ALT: () => this.SUBRULE(this.CommandsGroup) },
+    ])
+  })
+
+  protected CommandsGroup = this.RULE('CommandsGroup', () => {
+    this.CONSUME(CURLY_BRACKET_LEFT)
+    this.AT_LEAST_ONE(() => {
+      this.SUBRULE(this.MultipleCommandWithTerminator)
+    })
+    this.CONSUME(CURLY_BRACKET_RIGHT)
+  })
+
+  protected SubShell = this.RULE('SubShell', () => {
+    this.CONSUME(PARENTHESES_LEFT)
+    this.AT_LEAST_ONE(() => {
+      this.SUBRULE(this.MultipleCommand)
+    })
+    this.CONSUME(PARENTHESES_RIGHT)
+  })
+
   protected Pipeline = this.RULE('Pipeline', () => {
-    this.SUBRULE(this.ComposedCommand)
+    this.SUBRULE(this.PipelineBlock)
 
     this.MANY(() => {
       this.CONSUME(PIPE)
-      this.SUBRULE1(this.ComposedCommand)
+      this.SUBRULE1(this.PipelineBlock)
     })
   })
 

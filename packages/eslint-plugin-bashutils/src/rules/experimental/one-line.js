@@ -1,6 +1,10 @@
+// @flow
+
 import { tokens as availableTokens } from '@bash-utils/parser'
 
-export default {
+import { type T_Rule } from '../../types'
+
+const rule: T_Rule = {
   meta: {
     docs: {
       description: 'This rule only allows single-line scripts',
@@ -26,3 +30,5 @@ export default {
     }
   },
 }
+
+export default rule
