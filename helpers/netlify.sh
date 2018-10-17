@@ -2,7 +2,9 @@
 
 set -e
 
-./node_modules/.bin/lerna run docs
+npm i
+
+npm run docs
 
 rm -rf dist
 
