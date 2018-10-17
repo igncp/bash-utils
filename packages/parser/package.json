@@ -7,7 +7,7 @@
   "license": "MIT",
   "main": "lib/index.js",
   "scripts": {
-    "build": "rm -rf lib; tsc",
+    "build": "bash helpers/build.sh",
     "docs": "npm run build && node ./helpers/createDiagrams.js",
     "lint": "tslint 'src/**/*.ts' 'integration_tests/**/*.ts'",
     "lint-fix": "npm run lint -- --fix",
