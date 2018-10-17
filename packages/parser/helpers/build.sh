@@ -4,7 +4,9 @@ set -e
 
 rm -rf lib
 
-pwd
-ls -lah node_modules/.bin
+# Node v10 in Travis would remove this directory
+if [ ! -d node_modules ]; then
+  npm i
+fi
 
 ./node_modules/.bin/tsc
