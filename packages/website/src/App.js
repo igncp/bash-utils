@@ -3,11 +3,17 @@
 import JSONTree from 'react-json-tree'
 import React, { Component } from 'react'
 import { buildESTreeAstFromSource } from '@bash-utils/parser'
+import SyntaxHighlighter from 'react-syntax-highlighter'
+import { atomOneLight as hljsStyle } from 'react-syntax-highlighter/styles/hljs'
+import AceEditor from 'react-ace'
 
 import pjson from '../package.json'
 
 import jsonTreeTheme from './jsonTreeTheme'
 import './App.css'
+
+import 'brace/mode/sh'
+import 'brace/theme/github'
 
 const DEFAULT_CONTENT = `
 #!/usr/bin/env bash
@@ -21,6 +27,14 @@ type T_State = {|
   bashInputValue: string,
   estreeOutputValue: string,
 |}
+
+const HeaderLink = ({ children, href }) => {
+  return (
+    <a href={href} rel="noopener noreferrer" target="_blank">
+      {children}
+    </a>
+  )
+}
 
 class App extends Component<T_Props, T_State> {
   state = {
@@ -45,63 +59,68 @@ class App extends Component<T_Props, T_State> {
     })
   }
 
-  handleBashInputChange = (ev: SyntheticEvent<HTMLTextAreaElement>) => {
-    this.updateBoxes(ev.currentTarget.value)
+  handleBashInputChange = (value: string) => {
+    this.updateBoxes(value)
   }
 
   render() {
-    const commonTextareaProps = {
-      'data-gramm_editor': false,
-      autocapitalize: 'off',
-      autocomplete: 'off',
-      autocorrect: 'off',
-      rows: 25,
-      spellcheck: 'false',
-    }
-
     return (
       <div className="app">
         <h1>
-          <a href="https://github.com/igncp/bash-utils">{'Bash Utils'}</a>
+          <HeaderLink href="https://github.com/igncp/bash-utils">
+            {'Bash Utils'}
+          </HeaderLink>
         </h1>
         <p>
-          {'This website reflects the state on the latest release: '}
-          <b>
-            <a
-              href={`https://github.com/igncp/bash-utils/releases/tag/v${
-                pjson.version
-              }`}
-            >{`v${pjson.version}`}</a>
-          </b>
+          {
+            'Collection on utilities for Bash. This website reflects the state of the lates commit in the master branch.'
+          }
         </p>
         <p>
-          {'Collection on utilities for Bash.'}
-          <a className="grammar-link" href="grammar">
-            {'Parser Grammar'}
-          </a>
-          <span>{'. '}</span>
-          <a
-            className="grammar-link"
-            href="https://github.com/igncp/bash-utils/tree/master/packages/eslint-plugin-bashutils"
-          >
+          <HeaderLink
+            href={`https://github.com/igncp/bash-utils/releases/tag/v${
+              pjson.version
+            }`}
+          >{`Latest Release: v${pjson.version}`}</HeaderLink>
+          <span>{' | '}</span>
+          <HeaderLink href="grammar">{'Parser Grammar'}</HeaderLink>
+          <span>{' | '}</span>
+          <HeaderLink href="https://github.com/igncp/bash-utils/tree/master/packages/eslint-plugin-bashutils#eslint-plugin-bashutils">
             {'ESLint Package'}
-          </a>
+          </HeaderLink>
+          <span>{' | '}</span>
+          <HeaderLink href="flow-coverage">{'Flow Coverage'}</HeaderLink>
+          <span>{' | '}</span>
+          <HeaderLink href="parser-tests-coverage">
+            {'Parser Tests Coverage'}
+          </HeaderLink>
+          <span>{' | '}</span>
+          <HeaderLink href="eslint-tests-coverage">
+            {'ESLint Rules Tests Coverage'}
+          </HeaderLink>
         </p>
         <p>{'You can try the result of the parser and ESTree visitor:'}</p>
         <div className="inputs-container">
-          <textarea
-            className="bash-input"
-            {...commonTextareaProps}
-            onChange={this.handleBashInputChange}
-            value={this.state.bashInputValue}
-          />
-
-          <textarea
-            className="estree-output"
-            {...commonTextareaProps}
-            readOnly
-            value={JSON.stringify(this.state.estreeOutputValue, null, 2)}
-          />
+          <div className="bash-input">
+            <AceEditor
+              editorProps={{ $blockScrolling: true }}
+              height="400px"
+              mode="sh"
+              name="UNIQUE_ID_OF_DIV"
+              onChange={this.handleBashInputChange}
+              theme="github"
+              value={this.state.bashInputValue}
+            />
+          </div>
+          <div className="estree-output">
+            <SyntaxHighlighter
+              customStyle={{ margin: 0 }}
+              language="javascript"
+              style={hljsStyle}
+            >
+              {JSON.stringify(this.state.estreeOutputValue, null, 2)}
+            </SyntaxHighlighter>
+          </div>
         </div>
         <div className="json-tree-wrapper">
           <JSONTree data={this.state.estreeOutputValue} theme={jsonTreeTheme} />

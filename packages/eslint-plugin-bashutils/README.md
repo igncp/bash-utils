@@ -12,7 +12,3 @@ ESLint plugin to lint files using bash (e.g. with `.sh`extension). This plugin c
 - https://github.com/RokuRoad/eslint-plugin-roku
 - https://eslint.org/docs/developer-guide/nodejs-api
 - https://eslint.org/parser/
-
-## TODOs:
-
-- [ ] Improve Flow support: Add coverage (with threshold), add to more files

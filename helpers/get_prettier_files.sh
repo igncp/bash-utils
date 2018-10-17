@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 git ls-tree --full-tree -r HEAD |
-  grep -E '([tj]s|json|md)$' |
+  grep -E '([tj]s|json|md|css)$' |
   awk '{print $NF}' |
   grep -Ev '^docs' |
   grep -Ev '^flow-coverage' |

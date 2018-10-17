@@ -1,11 +1,15 @@
 .estree-output,
 .bash-input {
+  max-height: 400px;
+  outline: none;
+  overflow-y: auto;
   resize: none;
   width: 100%;
-  outline: none;
 }
 
 .estree-output {
+  border: 1px solid #ccc;
+  font-size: 12px;
   margin-left: 5px;
 }
 
@@ -27,13 +31,14 @@
 }
 
 .json-tree-wrapper {
-  height: 300px;
+  background: rgb(255, 248, 255);
   border: 1px solid #ccc;
+  height: 300px;
   margin: 20px 0 10px;
   overflow: auto;
 }
 
 footer {
-  text-align: center;
   margin: 20px 0;
+  text-align: center;
 }

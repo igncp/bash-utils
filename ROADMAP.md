@@ -3,7 +3,7 @@
 In the near term, with no particular order
 
 - Get parser to a stable state
-- Add tests coverage
+- Add thresholds: Jest and Flow
 
 Maybe
 

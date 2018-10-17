@@ -10,6 +10,8 @@ bash helpers/review_tslint_rules.sh
 
 ./node_modules/.bin/eslint .
 
+./node_modules/.bin/stylelint ./**/*.css
+
 ./node_modules/.bin/flow-coverage-report
 
 ./node_modules/.bin/lerna run lint

@@ -13,7 +13,7 @@
     "lint-fix": "npm run lint -- --fix",
     "prepublish": "npm run test && npm run build",
     "run-checks": "find helpers/checks -type f | xargs -I {} sh {}",
-    "test": "sh helpers/test.sh integration_tests",
+    "test": "sh helpers/test.sh integration_tests --coverage",
     "test-watch": "npm run test -- --watch"
   },
   "files": [

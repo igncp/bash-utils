@@ -11,7 +11,7 @@ npm run build
 
 echo "running rules tests"
 
-../../node_modules/.bin/jest src/rules
+../../node_modules/.bin/jest src/rules --coverage
 
 echo "running integration tests"
 

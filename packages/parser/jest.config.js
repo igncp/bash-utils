@@ -10,6 +10,7 @@ module.exports = {
   bail: true,
   collectCoverageFrom: ['src/**/*.ts', '!src/**/*.d.ts'],
   setupTestFrameworkScriptFile: '<rootDir>/helpers/setupTests.js',
+  coverageReporters: ['json', 'lcov', 'text-summary', 'clover'],
   globals: {
     'ts-jest': {
       tsConfig: path.resolve(path.join(__dirname, 'tsconfig.jest.json')),
