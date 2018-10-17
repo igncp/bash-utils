@@ -4,3 +4,4 @@ flow-coverage
 lib
 *.log
 *.tgz
+dist

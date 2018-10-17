@@ -7,4 +7,4 @@ npm run lint
 npm run test
 npm run docs
 
-echo "helpers/ci.sh completed correctly"
+echo "helpers/travis.sh completed correctly"

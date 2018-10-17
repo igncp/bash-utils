@@ -10,7 +10,6 @@ npm run lint
 npm run test
 npm run docs
 
-git add -A docs
 git add -A packages/eslint-plugin-bashutils/docs
 
 echo "helpers/gitHooks/precommit.sh completed correctly"
