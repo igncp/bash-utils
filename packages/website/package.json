@@ -2,7 +2,7 @@
   "name": "@bash-utils/website",
   "version": "0.0.4",
   "private": true,
-  "homepage": "https://igncp.github.io/bash-utils",
+  "homepage": "https://bash-utils.netlify.com",
   "dependencies": {
     "@bash-utils/parser": "^0.0.4",
     "react": "^16.5.2",
