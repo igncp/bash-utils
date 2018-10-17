@@ -73,7 +73,7 @@ class App extends Component<T_Props, T_State> {
         </h1>
         <p>
           {
-            'Collection on utilities for Bash. This website reflects the state of the lates commit in the master branch.'
+            'Collection of utilities for Bash. This website reflects the state of the latest commit in the master branch.'
           }
         </p>
         <p>
