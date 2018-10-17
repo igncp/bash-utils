@@ -1,7 +1,8 @@
 language: node_js
 node_js:
   - "10.4.1"
-  - "10.0.0"
+  #10.0.0 has a strange bug where node_modules are sometimes not available
+  - "10.1.0"
   - "8.12.0"
   - "8.0.0"
   - "6.14.4"
