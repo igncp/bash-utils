@@ -9,7 +9,7 @@
   "scripts": {
     "build": "bash helpers/build.sh",
     "docs": "npm run build && node ./helpers/createDiagrams.js",
-    "lint": "tslint 'src/**/*.ts' 'integration_tests/**/*.ts'",
+    "lint": "tslint --project tsconfig.json 'src/**/*.ts' 'integration_tests/**/*.ts'",
     "lint-fix": "npm run lint -- --fix",
     "prepublishOnly": "npm run test && npm run build",
     "run-checks": "find helpers/checks -type f | xargs -I {} sh {}",

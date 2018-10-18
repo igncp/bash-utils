@@ -1,6 +1,7 @@
 import * as allTokens from '../../tokens'
 
 import {
+  getIsValidVariableName,
   getRangeAndLocForText,
   moveNextNodeInsideIfNoSeparation,
   replaceItemInParent,
@@ -74,7 +75,7 @@ const getIsValidAssignment = token => {
   ) {
     const [first] = token.value.split('=')
 
-    return /^[A-Za-z_]+$/.test(first)
+    return getIsValidVariableName(first)
   }
 
   return false

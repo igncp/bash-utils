@@ -2,33 +2,88 @@ import { parse } from '../../parse'
 import * as allTokens from '../../tokens'
 
 import {
+  getIsValidVariableName,
   replaceItemInParent,
   sortByRange,
   updatePositions,
 } from './treeHelpers'
 import { walk } from './walker'
 
+const getNextPossibleVariableName = (text, chIdx) => {
+  const remainingText = text.substr(chIdx, text.length)
+  let variableName = ''
+
+  for (var i = 0; i < remainingText.length; i++) {
+    const ch = remainingText[i]
+
+    if (!getIsValidVariableName(ch)) {
+      return variableName || null
+    }
+
+    variableName += ch
+  }
+
+  return variableName
+}
+
 const getInterpolationStructures = text => {
   const structuresStack = []
   const structures = []
 
-  for (let i = 0; i <= text.length - 1; i++) {
-    const ch = text[i]
+  text.split('').forEach((ch, chIdx) => {
+    const nextCh = text[chIdx + 1]
+    const prevCh = text[chIdx - 1]
+    const lastStructureInStack = structuresStack[structuresStack.length - 1]
 
-    if (ch === '(' && text[i - 1] === '$' && text[i - 2] !== '\\') {
-      structuresStack.push(i - 1)
+    if (ch === '$' && prevCh !== '\\') {
+      if (nextCh === '(') {
+        structuresStack.push({
+          chIdx,
+          type: 'commandSubstitution',
+        })
+
+        return
+      }
+
+      const nextPossibleVariableName = getNextPossibleVariableName(
+        text,
+        chIdx + 1
+      )
+
+      if (nextPossibleVariableName) {
+        structuresStack.push({
+          chIdx,
+          endIdx: chIdx + nextPossibleVariableName.length + 1,
+          type: 'VariableInString',
+        })
+
+        return
+      }
+    } else if (lastStructureInStack) {
+      if (ch === ')' && lastStructureInStack.type === 'commandSubstitution') {
+        const beginning = structuresStack.pop().chIdx
+
+        structures.push({
+          beginning,
+          depth: structuresStack.length,
+          end: chIdx + 1,
+          type: 'commandSubstitution',
+        })
+      } else if (
+        lastStructureInStack.type === 'VariableInString' &&
+        chIdx === lastStructureInStack.endIdx
+      ) {
+        const beginning = structuresStack.pop().chIdx
+
+        structures.push({
+          beginning,
+          depth: structuresStack.length,
+          end: chIdx,
+          type: 'VariableInString',
+        })
+      }
     }
-
-    if (ch === ')' && structuresStack.length > 0) {
-      const beginning = structuresStack.pop()
-
-      structures.push({
-        beginning,
-        depth: structuresStack.length,
-        end: i + 1,
-      })
-    }
-  }
+  })
 
   return structures
 }
@@ -45,18 +100,27 @@ const getInitialBodyFromInterpolationStructures = (text, structures) => {
           range: [0, structure.beginning],
           type: 'RawString',
         })
-      } else if (lastItemInBody.end !== structure.beginning) {
+      } else if (lastItemInBody.range[1] !== structure.beginning) {
         body.push({
-          range: [lastItemInBody.end, structure.beginning],
+          range: [lastItemInBody.range[1], structure.beginning],
           type: 'RawString',
         })
       }
     }
 
-    body.push({
-      range: [structure.beginning, structure.end],
-      type: 'InterpolationFragment',
-    })
+    const range = [structure.beginning, structure.end]
+
+    if (structure.type === 'commandSubstitution') {
+      body.push({
+        range,
+        type: 'InterpolationFragment',
+      })
+    } else if (structure.type === 'VariableInString') {
+      body.push({
+        range,
+        type: 'VariableInString',
+      })
+    }
 
     if (
       structureIdx === structures.length - 1 &&
@@ -175,12 +239,16 @@ const visitTreeToParseStrings = (tree, visitAllRecursive) => {
 
     leave(item) {
       if (item.type === 'Program') {
-        for (let i = item.tokens.length - 1; i >= 0; i--) {
-          const token = item.tokens[i]
-          const idx = stringTokensToRemove.indexOf(token)
+        for (
+          let allTokensIdx = item.tokens.length - 1;
+          allTokensIdx >= 0;
+          allTokensIdx--
+        ) {
+          const token = item.tokens[allTokensIdx]
+          const idxInTokensToRemove = stringTokensToRemove.indexOf(token)
 
-          if (idx !== -1) {
-            item.tokens.splice(idx, 1)
+          if (idxInTokensToRemove !== -1) {
+            item.tokens.splice(allTokensIdx, 1)
           }
         }
 

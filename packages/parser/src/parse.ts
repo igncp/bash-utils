@@ -308,7 +308,7 @@ export class Parser extends ChevParser {
       recoveryEnabled: false,
     })
 
-    Parser.performSelfAnalysis(this)
+    this.performSelfAnalysis()
   }
 }
 

@@ -96,3 +96,7 @@ export const updatePositions = (item, baseRange, basePos) => {
     },
   })
 }
+
+export const getIsValidVariableName = text => {
+  return /^[A-Za-z_]+$/.test(text)
+}

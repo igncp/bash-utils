@@ -111,12 +111,31 @@ esac`,
       missingTokens: [tokens.IDENTIFIER],
     })
     check('echo "$FOO"', {
-      containingTokens: [tokens.STRING, tokens.IDENTIFIER],
+      containingNodes: ['CompoundString'],
+      containingTokens: [tokens.IDENTIFIER],
     })
   })
 
   test('strings interpolation', () => {
     check('echo "$(foo | bar)"', { containingTokens: [tokens.PIPE] })
+    check('echo "$FOO bar"', {
+      containingNodes: ['VariableInString'],
+      containingTokens: [tokens.IDENTIFIER],
+      traverseFn: node => {
+        if (node.type === 'VariableInString') {
+          expect(node.value).toEqual('$FOO')
+        }
+      },
+    })
+    check('echo "$FOO bar $BAR"', {
+      containingNodes: ['VariableInString'],
+      containingTokens: [tokens.IDENTIFIER],
+      traverseFn: node => {
+        if (node.type === 'VariableInString') {
+          expect(node.value === '$FOO' || node.value === '$BAR').toEqual(true)
+        }
+      },
+    })
   })
 
   test('shebang', () => {
