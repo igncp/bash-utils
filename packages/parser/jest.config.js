@@ -1,5 +1,10 @@
 const path = require('path')
 
+const pjson = require('./package.json')
+
+const coverageThreshold =
+  pjson.jest && pjson.jest.coverageThreshold ? pjson.jest.coverageThreshold : {}
+
 module.exports = {
   transform: {
     '^.+\\.tsx?$': 'ts-jest',
@@ -18,12 +23,5 @@ module.exports = {
       diagnostics: false,
     },
   },
-  coverageThreshold: {
-    global: {
-      statements: 96.42,
-      branches: 91.28,
-      functions: 92.68,
-      lines: 96.55,
-    },
-  },
+  coverageThreshold,
 }
