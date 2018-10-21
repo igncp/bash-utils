@@ -2,7 +2,7 @@
 
 import { tokens as availableTokens } from '@bash-utils/parser'
 
-import { type T_Rule } from '../../types'
+import type { T_Rule, T_ESTreeProgramNode } from '../../types'
 
 const rule: T_Rule = {
   meta: {
@@ -14,7 +14,7 @@ const rule: T_Rule = {
     const sourceCode = ctx.getSourceCode()
 
     return {
-      Program(node) {
+      Program(node: T_ESTreeProgramNode) {
         const tokens = sourceCode.getTokens(node)
         const newLineTokens = tokens.filter(
           t => t.type === availableTokens.NEWLINE.tokenName

@@ -2,8 +2,9 @@ import { createToken, Lexer } from 'chevrotain'
 
 export const IDENTIFIER = createToken({
   name: 'IDENTIFIER',
-  pattern: /[A-Za-z_\-0-9=\/.$@~%\]\[#]+/,
+  pattern: /[A-Za-z_\-0-9\{\}=?+\/.$@~%!\]\[#]+/,
 })
+
 export const TERMINATOR = createToken({ name: 'TERMINATOR', pattern: Lexer.NA })
 
 export const SEMICOLON = createToken({
@@ -66,10 +67,6 @@ export const COMMAND_SUBSTITUTION_LEFT = createToken({
   name: 'COMMAND_SUBSTITUTION_LEFT',
   pattern: '$(',
 })
-export const PARAMETER_EXPANSION_LEFT = createToken({
-  name: 'PARAMETER_EXPANSION_LEFT',
-  pattern: '${',
-})
 export const PARENTHESES_RIGHT = createToken({
   name: 'PARENTHESES_RIGHT',
   pattern: ')',
@@ -79,6 +76,7 @@ export const PARENTHESES_LEFT = createToken({
   pattern: '(',
 })
 export const CURLY_BRACKET_LEFT = createToken({
+  longer_alt: IDENTIFIER,
   name: 'CURLY_BRACKET_LEFT',
   pattern: '{',
 })
@@ -160,7 +158,6 @@ export const ALL_TOKENS = [
   COMMAND_SUBSTITUTION_LEFT,
   PROCESS_SUBSTITUTION_LT_LEFT,
   PROCESS_SUBSTITUTION_GT_LEFT,
-  PARAMETER_EXPANSION_LEFT,
   PARENTHESES_RIGHT,
   CURLY_BRACKET_RIGHT,
   AND,

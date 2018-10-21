@@ -14,7 +14,6 @@ import {
   IF,
   NEWLINE,
   OR,
-  PARAMETER_EXPANSION_LEFT,
   PARENTHESES_LEFT,
   PARENTHESES_RIGHT,
   PIPE,
@@ -39,8 +38,16 @@ const Lexer = new ChevLexer(ALL_TOKENS, {
 
 export class Parser extends ChevParser {
   public Script = this.RULE('Script', () => {
+    this.MANY(() => {
+      this.CONSUME(NEWLINE)
+    })
+
     this.OPTION1(() => {
       this.SUBRULE(this.MultipleCommand)
+    })
+
+    this.MANY1(() => {
+      this.CONSUME1(NEWLINE)
     })
 
     this.OPTION2(() => {
@@ -56,43 +63,68 @@ export class Parser extends ChevParser {
   })
 
   protected MultipleCommand = this.RULE('MultipleCommand', () => {
-    this.AT_LEAST_ONE(() => {
-      this.OR([
-        { ALT: () => this.SUBRULE(this.Termination) },
-        { ALT: () => this.SUBRULE(this.IfExpression) },
-        { ALT: () => this.SUBRULE(this.Pipeline) },
-        { ALT: () => this.SUBRULE(this.Comment) },
+    this.OR([
+      { ALT: () => this.SUBRULE(this.IfExpression) },
+      { ALT: () => this.SUBRULE(this.Pipeline) },
+      { ALT: () => this.SUBRULE(this.Comment) },
+    ])
+
+    this.MANY(() => {
+      this.SUBRULE1(this.Termination)
+
+      this.OR1([
+        { ALT: () => this.SUBRULE2(this.IfExpression) },
+        { ALT: () => this.SUBRULE2(this.Pipeline) },
+        { ALT: () => this.SUBRULE2(this.Comment) },
       ])
+    })
+
+    this.OPTION(() => {
+      this.SUBRULE(this.Termination)
     })
   })
 
   protected MultipleCommandWithTerminator = this.RULE(
     'MultipleCommandWithTerminator',
     () => {
-      this.AT_LEAST_ONE(() => {
-        this.OR([
-          { ALT: () => this.SUBRULE(this.Pipeline) },
-          { ALT: () => this.SUBRULE(this.IfExpression) },
-        ])
+      this.OR([
+        { ALT: () => this.SUBRULE(this.IfExpression) },
+        { ALT: () => this.SUBRULE(this.Pipeline) },
+        { ALT: () => this.SUBRULE(this.Comment) },
+      ])
 
-        this.SUBRULE(this.Termination)
+      this.MANY(() => {
+        this.SUBRULE1(this.Termination)
+
+        this.OR1([
+          { ALT: () => this.SUBRULE2(this.IfExpression) },
+          { ALT: () => this.SUBRULE2(this.Pipeline) },
+          { ALT: () => this.SUBRULE2(this.Comment) },
+        ])
       })
+
+      this.SUBRULE(this.Termination)
     }
   )
 
   protected Termination = this.RULE('Termination', () => {
     this.OR([
       { ALT: () => this.CONSUME(SEMICOLON) },
-      { ALT: () => this.CONSUME(NEWLINE) },
+      {
+        ALT: () => {
+          this.AT_LEAST_ONE(() => {
+            this.CONSUME(NEWLINE)
+          })
+        },
+      },
     ])
   })
 
   protected CommandUnit = this.RULE('CommandUnit', () => {
     this.OR([
-      { ALT: () => this.SUBRULE(this.Literal) },
       { ALT: () => this.SUBRULE(this.ProcessSubstitution) },
-      { ALT: () => this.SUBRULE(this.CommandSubstitution) },
-      { ALT: () => this.SUBRULE(this.ParameterExpansion) },
+      { ALT: () => this.SUBRULE(this.CommandSubstitutionGroup) },
+      { ALT: () => this.SUBRULE(this.Literal) },
     ])
   })
 
@@ -112,12 +144,6 @@ export class Parser extends ChevParser {
 
     this.SUBRULE(this.MultipleCommand)
     this.CONSUME(PARENTHESES_RIGHT)
-  })
-
-  protected ParameterExpansion = this.RULE('ParameterExpansion', () => {
-    this.CONSUME(PARAMETER_EXPANSION_LEFT)
-    this.SUBRULE(this.MultipleCommand)
-    this.CONSUME(CURLY_BRACKET_RIGHT)
   })
 
   protected BacktickExpression = this.RULE('BacktickExpression', () => {
@@ -143,17 +169,29 @@ export class Parser extends ChevParser {
     ])
   })
 
+  protected CommandSubstitutionGroup = this.RULE(
+    'CommandSubstitutionGroup',
+    () => {
+      this.SUBRULE(this.CommandSubstitution)
+    }
+  )
+
   protected Command = this.RULE('Command', () => {
     this.AT_LEAST_ONE(() => {
       this.SUBRULE(this.CommandUnit)
     })
 
-    this.OPTION(() => {
-      this.CONSUME(AMPERSAND)
+    this.MANY(() => {
+      this.OR([
+        { ALT: () => this.SUBRULE(this.Redirection) },
+        { ALT: () => this.SUBRULE1(this.CommandUnit) },
+        { ALT: () => this.CONSUME(CURLY_BRACKET_LEFT) },
+        { ALT: () => this.CONSUME(CURLY_BRACKET_RIGHT) },
+      ])
     })
 
-    this.OPTION1(() => {
-      this.SUBRULE1(this.Redirection)
+    this.OPTION(() => {
+      this.CONSUME(AMPERSAND)
     })
   })
 
@@ -180,9 +218,9 @@ export class Parser extends ChevParser {
 
   protected PipelineBlock = this.RULE('PipelineBlock', () => {
     this.OR([
-      { ALT: () => this.SUBRULE(this.ComposedCommand) },
       { ALT: () => this.SUBRULE(this.SubShell) },
       { ALT: () => this.SUBRULE(this.CommandsGroup) },
+      { ALT: () => this.SUBRULE(this.ComposedCommand) },
     ])
   })
 
@@ -206,14 +244,15 @@ export class Parser extends ChevParser {
     this.SUBRULE(this.PipelineBlock)
 
     this.MANY(() => {
-      this.CONSUME(PIPE)
+      this.CONSUME1(PIPE)
+      this.OPTION(() => {
+        this.CONSUME(NEWLINE)
+      })
       this.SUBRULE1(this.PipelineBlock)
     })
-  })
 
-  protected WordList = this.RULE('WordList', () => {
-    this.AT_LEAST_ONE(() => {
-      this.CONSUME(IDENTIFIER)
+    this.OPTION1(() => {
+      this.SUBRULE1(this.Comment)
     })
   })
 
@@ -312,7 +351,7 @@ export class Parser extends ChevParser {
   }
 }
 
-const tokens = (list = []) => {
+const getTokens = list => {
   return list.map(t => {
     const { length } = t.image
     const range: [number, number] = [t.startOffset, t.startOffset + length]
@@ -329,7 +368,7 @@ const tokens = (list = []) => {
   })
 }
 
-const errors = (list = []) =>
+const errors = list =>
   list.map(({ name, message, token }) => {
     const location = {
       end: {
@@ -377,7 +416,7 @@ export const parse = (source, { entry = 'Script' } = {}) => {
     lexErrors: lexingResult.errors,
     parseErrors,
     parser,
-    tokens: tokens(lexingResult.tokens),
+    tokens: getTokens(lexingResult.tokens),
     value,
   }
 }

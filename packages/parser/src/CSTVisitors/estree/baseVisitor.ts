@@ -43,10 +43,10 @@ const getLocationAndRangeForNodes = nodesArr => {
     } else {
       return {
         loc: {
-          end: { line: 0, column: 0 },
-          start: { line: 0, column: 0 },
+          end: { line: 1, column: 1 },
+          start: { line: 1, column: 0 },
         },
-        range: [0, 0],
+        range: [0, 1],
       }
     }
   }
@@ -135,6 +135,7 @@ const baseVisitorKeysWithBody = [
   'BacktickExpression',
   'Command',
   'CommandSubstitution',
+  'CommandSubstitutionGroup',
   'CommandUnit',
   'CommandsGroup',
   'Comment',

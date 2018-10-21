@@ -4,6 +4,7 @@ set -e
 
 # looking for all files till it needs filtering
 DOT_ONLY_OCCURRENCES=$(find . -type f ! -path "*node_modules*" ! -name "check_only_tests.sh" |
+  grep -v copied_fixture_files | \
   xargs grep -E '\.only\(' || true)
 
 if [ ! -z "$DOT_ONLY_OCCURRENCES" ]; then

@@ -5,7 +5,9 @@ ESLint plugin to lint files using bash (e.g. with `.sh`extension). This plugin c
 ## Rules
 
 - [**no-multiple-empty-lines**](./docs/no-multiple-empty-lines.md): Disallows adding more than one empty lines
+- [**no-multiple-spaces**](./docs/no-multiple-spaces.md): Forbids adding multiple consecutive spaces (except certain cases)
 - [**require-shebang**](./docs/require-shebang.md): Requires adding a shebang in the top of the script
+- [**sets-options**](./docs/sets-options.md): Enforces or forbids setting certain options
 
 ## References
 

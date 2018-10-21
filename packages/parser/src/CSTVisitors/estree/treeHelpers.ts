@@ -86,13 +86,13 @@ export const updatePositions = (item, baseRange, basePos) => {
       subItem.range[0] += baseRange[0]
       subItem.range[1] += baseRange[0]
 
-      if (subItem.loc.start.line === 0) {
+      if (subItem.loc.start.line === 1) {
         subItem.loc.start.column += basePos.column
         subItem.loc.end.column += basePos.column
       }
 
-      subItem.loc.start.line += basePos.line
-      subItem.loc.end.line += basePos.line
+      subItem.loc.start.line += basePos.line - 1
+      subItem.loc.end.line += basePos.line - 1
     },
   })
 }

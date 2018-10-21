@@ -3,9 +3,5 @@
 In the near term, with no particular order
 
 - Get parser to a stable state
-- Add thresholds: Jest and Flow
-
-Maybe
-
-- Include Sonar support (to run via Docker)
-- RULE: Require `set -e` in script
+  - Improve Identifier matcher to support more complex command substitution
+- Include Sonar support to detect duplication blocks. Should be run via Docker

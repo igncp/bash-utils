@@ -5,6 +5,7 @@ import {
 import { getBacktickVisitor } from './backtickVisitor'
 import { baseVisitorKeysObj, getBaseVisitor } from './baseVisitor'
 import { getIfConditionsVisitor } from './ifConditionsVisitor'
+import { getParametersExpansionVisitor } from './parametersExpansionVisitor'
 import { getRemoveParentVistor } from './removeParentVisitor'
 import { getShebangVisitor, shebangVisitorKeysObj } from './shebangVisitor'
 import { getStringsVisitor } from './stringsVisitor'
@@ -13,6 +14,7 @@ const VISITORS_FACTORIES = [
   getBaseVisitor,
   getBacktickVisitor,
   getStringsVisitor,
+  getParametersExpansionVisitor,
   getShebangVisitor,
   getAssignmentsVisitor,
   getIfConditionsVisitor,

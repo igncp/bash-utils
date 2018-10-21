@@ -4,7 +4,7 @@
   "rules": {
     "adjacent-overload-signatures": true,
     "align": true,
-    "array-type": true,
+    "array-type": false,
     "arrow-parens": false,
     "arrow-return-shorthand": true,
     "await-promise": true,

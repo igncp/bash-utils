@@ -9,7 +9,10 @@ npm run postinstall
 npm run run-checks
 npm run build
 npm run lint
+
 npm run test
+./node_modules/.bin/lerna run test-ratchet
+
 npm run docs
 
 git add -A packages/eslint-plugin-bashutils/docs

@@ -17,6 +17,8 @@ bash helpers/review_tslint_rules.sh
 ./node_modules/.bin/lerna run lint
 
 TODOS=$(find . -type f ! -path "*node_modules*" ! -path "*.git/*" | \
+  grep -v coverage | \
+  grep -v dist | \
   xargs grep '@TODO' | \
   grep -v 'lint.sh')
 

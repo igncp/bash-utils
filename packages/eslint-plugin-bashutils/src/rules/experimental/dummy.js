@@ -1,6 +1,6 @@
 // @flow
 
-import { type T_Context } from '../../types'
+import type { T_Context } from '../../types'
 
 const SHOULD_REPORT_DUMMY = false
 
@@ -10,7 +10,16 @@ const rule = {
       ctx.report({
         message: 'Dummy error',
         data: {},
-        loc: { start: 1, end: 2 },
+        loc: {
+          start: {
+            line: 1,
+            column: 1,
+          },
+          end: {
+            line: 1,
+            column: 2,
+          },
+        },
       })
     }
 

@@ -1,9 +1,9 @@
 import { readdir, readFileSync, writeFileSync } from 'fs'
 
-import { buildESTreeAstFromSource, parse, tokens } from '../src'
-import { getESTreeConverterVisitor } from '../src/CSTVisitors/estree'
+import { buildESTreeAstFromSource, parse, tokens } from '../../src'
+import { getESTreeConverterVisitor } from '../../src/CSTVisitors/estree'
 
-import check from './checkESTree'
+import { check, checkAllFilesInDir } from './checkESTree'
 
 // @TODO: some of these should not throw but return errors instead
 describe('parse errors', () => {
@@ -31,6 +31,7 @@ describe('parse errors', () => {
     check('if [ foo ]; then bar fi', { throws: true })
     check('if [ true ]; then; echo; fi', { throws: true })
     check('if [ foo bar ]; then bar; fi', { throws: true })
+    check('if [ foo bar foo foo ]; then bar; fi', { throws: true })
     check('if [ -z -z bar ]; then bar; fi', { throws: true })
     check('if [ -z bar]; then bar; fi', { throws: true })
     check('if [ -z ]; then bar; fi', { throws: true })
@@ -42,11 +43,7 @@ describe('parse errors', () => {
     check(`foo " bar'`, { throws: true })
   })
 
-  test('parameters expansion', () => {
-    check('${foo', { throws: true })
-  })
-
-  test('command expansion', () => {
+  test('command substitution', () => {
     check('$(foo', { throws: true })
     check('`foo', { throws: true })
   })
@@ -64,6 +61,9 @@ describe('parse errors', () => {
     check('echo foo()', { throws: true })
     check('echo foo)', { throws: true })
     check('echo & &', { throws: true })
+    check('echo ( echo )', { throws: true })
+    check('${foo', { throws: true })
+    check('bar ${foo | bar > baz}', { throws: true })
   })
 
   test('pipelines', () => {
@@ -77,7 +77,7 @@ describe('non parse errors', () => {
     check('echo \\(\\)', { throws: true })
     check('select fname in foo; do echo $fname; done', {
       containingNodes: ['SelectExpression'],
-      errorsCheck: true,
+      errorsOnChecks: true,
     })
     check(
       `
@@ -94,10 +94,16 @@ case $FOO in
 esac`,
       { throws: true }
     )
+    check('$(echo bar)a$(echo baz)', {
+      containsNumWhere: [
+        { num: 2, fn: node => node.type === 'CommandSubstitution' },
+      ],
+      throws: true,
+    })
   })
 
   test('strings', () => {
-    check('echo foo"a"', { containingTokens: [tokens.STRING] })
+    check('foo"a"', { containingTokens: [tokens.STRING, tokens.IDENTIFIER] })
     check('echo "$@@@"')
     check('echo "$@"')
     check("foo 'bar'", { containingTokens: [tokens.STRING, tokens.IDENTIFIER] })
@@ -126,6 +132,15 @@ esac`,
           expect(node.value).toEqual('$FOO')
         }
       },
+    })
+    check('echo "$% bar"', {
+      missingNodes: ['VariableInString'],
+    })
+    check('echo "$A"', {
+      containingNodes: ['VariableInString'],
+    })
+    check('echo "$( # foo )"', {
+      containsComments: true,
     })
     check('echo "$FOO bar $BAR"', {
       containingNodes: ['VariableInString'],
@@ -167,6 +182,10 @@ esac`,
     check('( echo foo; cat bar.txt )', { containingNodes: ['SubShell'] })
     check('( echo foo; cat bar.txt; )', { containingNodes: ['SubShell'] })
     check('{ echo foo; cat bar.txt; }', { containingNodes: ['CommandsGroup'] })
+    check(
+      `cat foo |
+grep bar`
+    )
   })
 
   test('comments', () => {
@@ -174,6 +193,8 @@ esac`,
       containingNodes: ['Comment'],
       missingNodes: ['Command'],
     })
+    check(`
+#!/foo/bar`)
     check('foo # bar $(( "', {
       containingNodes: ['Comment', 'Command'],
     })
@@ -182,6 +203,8 @@ esac`,
   test('simple commands', () => {
     check('.//foo/bar.baz bar')
     check('find .')
+    check('echo {')
+    check('echo foo{')
     check('./foo/bar.baz foo')
     check('echo $ FOO')
     check('echo $.a@#%~', {
@@ -197,6 +220,7 @@ esac`,
     check('foo_bar baz bam')
     check('set -e')
     check('echo &')
+    check('    ')
   })
 
   test('redirections', () => {
@@ -242,6 +266,15 @@ esac`,
       containingNodes: ['ProcessSubstitution'],
       missingNodes: ['CommandSubstitution', 'ParameterExpansion'],
     })
+    check('$(echo bar)$(echo baz)', {
+      containsNumWhere: [
+        { num: 2, fn: node => node.type === 'CommandSubstitution' },
+      ],
+    })
+    check('echo >(cat foo.txt)', {
+      containingNodes: ['ProcessSubstitution'],
+      missingNodes: ['CommandSubstitution', 'ParameterExpansion'],
+    })
     check('cat $(echo foo.txt)', {
       containingNodes: ['CommandSubstitution'],
       missingNodes: ['ProcessSubstitution', 'ParameterExpansion'],
@@ -250,16 +283,30 @@ esac`,
       containingNodes: ['ParameterExpansion'],
       missingNodes: ['CommandSubstitution', 'ProcessSubstitution'],
     })
-    check('bar ${foo | bar > baz}')
     check('echo $()')
     check('echo $( $( echo foo ) )')
     check('if [ $() $() -z bar ]; then bar; fi')
     check('if [ `` `` `` -z bar ]; then bar; fi')
     check('`foo`', { containingTokens: [tokens.IDENTIFIER] })
+    check('echo `# foo` bar', {
+      containsComments: true,
+      containsNumWhere: [
+        {
+          fn: n => n.value === 'bar' && n.type === tokens.IDENTIFIER.tokenName,
+          num: 1,
+        },
+        {
+          fn: n => n.type === tokens.COMMENT.tokenName,
+          num: 1,
+        },
+      ],
+    })
   })
 
   test('if expressions', () => {
     check('if [ foo ]; then bar; fi')
+    check('if [ ! -z foo ]; then bar; fi')
+    check('if [ ! ! ! ! -z foo ]; then bar; fi')
     check('if [ foo ] || [ bar ]; then echo foo; fi')
     check('if [ foo ] && [ bar ]; then echo foo; fi')
     check('if [ foo ] && [[ bar ]]; then echo foo; fi')
@@ -272,9 +319,14 @@ esac`,
     check('if [ foo     ]; then bar; fi')
     check(
       `if [ foo ]
-  then
-  bar
-  fi`
+      then
+        bar
+      fi`
+    )
+    check(
+      `if [ foo ]; then
+        if [ bar ]; then echo foo; fi
+       fi`
     )
   })
 
@@ -304,23 +356,9 @@ esac`,
     )
   })
 
-  test('files', done => {
-    const filesPath = `${__dirname}/fixture_files`
+  checkAllFilesInDir('fixture_files')
 
-    readdir(filesPath, (err, files) => {
-      if (err) {
-        throw err
-      }
-
-      files.forEach(fileName => {
-        const fileContent = readFileSync(`${filesPath}/${fileName}`, 'utf-8')
-
-        expect(typeof fileContent).toEqual('string')
-
-        check(fileContent)
-      })
-
-      done()
-    })
-  })
+  // till the parser is stable enough, this has to be skipped.
+  // at the time of writing: failing 9 of 28 files
+  checkAllFilesInDir('copied_fixture_files', { skipAllExcept: [] })
 })

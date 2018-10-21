@@ -1,27 +1,38 @@
 // @flow
 
-import type { T_Rule, T_ESTreeProgramNode } from '../../types'
+/**
+ * Forbids adding multiple consecutive spaces (except certain cases)
+ *
+ * ### Valid
+ *
+ * ```sh
+ * echo foo
+ * ```
+ *
+ * ### Invalid
+ *
+ * ```sh
+ * echo   foo
+ * ```
+ *
+ * @module No Multiple Spaces
+ */
 
-const MESSAGE_MULTIPLE = 'Multiple spaces are not allowd'
+import type { T_Rule, T_ESTreeProgramNode } from '../../types'
 
 const rule: T_Rule = {
   meta: {
     docs: {
       description: 'This rule only allows one space for separation',
     },
+    messages: {
+      multiple: 'Multiple spaces are not allowd',
+    },
   },
   create(ctx) {
     return {
       Program(node: T_ESTreeProgramNode) {
         const allItems = node.tokens.concat(node.comments).sort((a, b) => {
-          if (typeof a.range[0] === 'undefined') {
-            return 1
-          }
-
-          if (typeof b.range[0] === 'undefined') {
-            return -1
-          }
-
           return a.range[0] - b.range[0]
         })
 
@@ -37,7 +48,7 @@ const rule: T_Rule = {
             item.range[0] - prevItem.range[1] > 1
           ) {
             ctx.report({
-              message: MESSAGE_MULTIPLE,
+              messageId: 'multiple',
               node: item,
             })
           }
@@ -45,13 +56,6 @@ const rule: T_Rule = {
       },
     }
   },
-}
-
-// istanbul ignore else
-if (global.__TEST__) {
-  rule._test = {
-    MESSAGE_MULTIPLE,
-  }
 }
 
 export default rule

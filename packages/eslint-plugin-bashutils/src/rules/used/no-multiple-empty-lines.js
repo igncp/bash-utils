@@ -25,7 +25,7 @@
 
 import { tokens as availableTokens } from '@bash-utils/parser'
 
-import { type T_Rule } from '../../types'
+import type { T_Rule } from '../../types'
 
 // @TODO:
 // - Option to configure the number of lines

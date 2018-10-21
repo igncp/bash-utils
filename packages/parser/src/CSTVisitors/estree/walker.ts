@@ -1,5 +1,7 @@
-// forked from: https://github.com/Rich-Harris/estree-walker/blob/master/src/estree-walker.js
-// with the addition of: it will ignore the `parent` key
+// forked from:
+// https://github.com/Rich-Harris/estree-walker/blob/master/src/estree-walker.js
+// with the addition of: it will ignore a few keys: 'parent', 'tokens' and
+// 'comments'
 
 export function walk(
   ast,
@@ -49,7 +51,7 @@ function visit(node, parent, enter, leave, prop, index) {
     const key = keys[i]
     const value = node[key]
 
-    if (key === 'parent') {
+    if (key === 'parent' || key === 'tokens' || key === 'comments') {
       continue
     }
 

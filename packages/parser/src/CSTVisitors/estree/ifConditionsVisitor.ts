@@ -14,6 +14,8 @@ const OPERATORS_VALUES = [
   '-n',
   '-ne',
   '-z',
+  '-d',
+  '-f',
   '<',
   '<',
   '<=',
@@ -41,11 +43,24 @@ const getIsOperatorLiteralNode = literalNode => {
   return false
 }
 
+const removeBeginningExclamationMarks = (acc, literalNode) => {
+  if (
+    literalNode.body.length !== 1 ||
+    literalNode.body[0].type !== allTokens.IDENTIFIER.tokenName ||
+    literalNode.body[0].value !== '!'
+  ) {
+    acc.push(literalNode)
+  }
+
+  return acc
+}
+
 const validateSingleBracketsCondition = node => {
   const literalNodes = node.body
     .filter(n => n.type === 'CommandUnit')
     .map(b => b.body[0])
     .filter(n => n.type === 'Literal')
+    .reduce(removeBeginningExclamationMarks, [])
 
   if (literalNodes.length > 3) {
     throw new Error('Too many literal nodes')

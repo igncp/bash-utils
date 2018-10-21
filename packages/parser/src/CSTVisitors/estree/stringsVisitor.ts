@@ -17,13 +17,13 @@ const getNextPossibleVariableName = (text, chIdx) => {
     const ch = remainingText[i]
 
     if (!getIsValidVariableName(ch)) {
-      return variableName || null
+      break
     }
 
     variableName += ch
   }
 
-  return variableName
+  return variableName || null
 }
 
 const getInterpolationStructures = text => {
@@ -138,11 +138,11 @@ const getInitialBodyFromInterpolationStructures = (text, structures) => {
     item.loc = {
       end: {
         column: item.range[1],
-        line: 0,
+        line: 1,
       },
       start: {
         column: item.range[0],
-        line: 0,
+        line: 1,
       },
     }
   })
@@ -182,11 +182,11 @@ const visitTreeToParseStrings = (tree, visitAllRecursive) => {
           loc: {
             end: {
               column: item.value.length,
-              line: 0,
+              line: 1,
             },
             start: {
               column: 0,
-              line: 0,
+              line: 1,
             },
           },
           range: item.range.slice(0),

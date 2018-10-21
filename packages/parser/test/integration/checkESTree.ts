@@ -1,8 +1,8 @@
-import { writeFileSync } from 'fs'
+import { readdirSync, readFileSync, writeFileSync } from 'fs'
 
-import { buildESTreeAstFromSource, parse } from '../src'
-import { getESTreeConverterVisitor } from '../src/CSTVisitors/estree'
-import { walk } from '../src/CSTVisitors/estree/walker'
+import { buildESTreeAstFromSource, parse } from '../../src'
+import { getESTreeConverterVisitor } from '../../src/CSTVisitors/estree'
+import { walk } from '../../src/CSTVisitors/estree/walker'
 
 const debug = false
 
@@ -15,6 +15,20 @@ const getAreLocsOverlapping = (locA, locB) => {
     getIsPos1Before2(locA.start, locB.end) &&
     getIsPos1Before2(locB.start, locA.end)
   )
+}
+
+const runContainsNumWhere = ({ treeResult, fn, num }) => {
+  let matches = 0
+
+  walk(treeResult, {
+    enter(...args) {
+      if (fn(...args)) {
+        matches += 1
+      }
+    },
+  })
+
+  expect(matches).toEqual(num)
 }
 
 const runCustomFnOnTree = ({ treeResult, traverseFn }) => {
@@ -38,6 +52,10 @@ const validateRangesAndLocsForArr = (arr, allArrays = []) => {
     }
 
     try {
+      // lines are always 1-based
+      expect(item.loc.start.line).not.toEqual(0)
+      expect(item.loc.end.line).not.toEqual(0)
+
       expect(item.range[0] >= 0).toEqual(true)
       expect(item.range[1] >= 0).toEqual(true)
       expect(item.range[0] < item.range[1]).toEqual(true)
@@ -88,6 +106,10 @@ const validateRangesAndLocs = ({ treeResult }) => {
       if (item.body) {
         validateRangesAndLocsForArr(item.body)
       }
+
+      if (item.type === 'Program') {
+        validateRangesAndLocsForArr([item])
+      }
     },
   })
 }
@@ -134,18 +156,16 @@ const getContainsCommentsFn = ({ treeResult }) => () => {
   return treeResult.comments.length > 0
 }
 
-// Till the grammar is relatively stable, only expected errors / success are
-// tested
-
-export default (
+export const check = (
   text,
   {
     throws = false,
-    errorsCheck = false,
+    errorsOnChecks = false,
     containsComments = null,
     containingNodes = [],
     missingNodes = [],
     containingTokens = [],
+    containsNumWhere = [],
     missingTokens = [],
     traverseFn = (...args) => args,
   }: any = {}
@@ -213,6 +233,14 @@ export default (
       expect(getContainsComments()).toEqual(containsComments)
     }
 
+    containsNumWhere.forEach(({ fn, num }) => {
+      runContainsNumWhere({
+        fn,
+        num,
+        treeResult,
+      })
+    })
+
     validateRangesAndLocs({ treeResult })
 
     runCustomFnOnTree({ treeResult, traverseFn })
@@ -226,7 +254,7 @@ export default (
       expect(checkingFn).not.toThrow()
     }
   } catch (e) {
-    if (!errorsCheck) {
+    if (!errorsOnChecks) {
       // debugger
       throw e
     }
@@ -234,7 +262,39 @@ export default (
     return
   }
 
-  if (errorsCheck) {
+  if (errorsOnChecks) {
     throw new Error('no errors on checks')
   }
+}
+
+export const checkAllFilesInDir = (
+  relFilesPath,
+  skip: { skipAllExcept?: string[] } = {}
+) => {
+  // add (dot)only when testing locally - should not be possible to be committed
+  const describeFn = skip.skipAllExcept ? describe : describe
+
+  describeFn(relFilesPath, () => {
+    const filesPath = `${__dirname}/${relFilesPath}`
+    const files = readdirSync(filesPath)
+
+    files
+      .filter(fileName => {
+        return fileName.substr(-3) === '.sh'
+      })
+      .forEach(fileName => {
+        const parsedFileName = fileName.replace('.sh', '')
+        const shouldSkip = skip.skipAllExcept
+          ? skip.skipAllExcept.indexOf(parsedFileName) === -1
+          : false
+        const testFn = shouldSkip ? test.skip : test
+
+        testFn(`${relFilesPath}/${fileName}`, () => {
+          const fileContent = readFileSync(`${filesPath}/${fileName}`, 'utf-8')
+
+          expect(typeof fileContent).toEqual('string')
+          check(fileContent)
+        })
+      })
+  })
 }

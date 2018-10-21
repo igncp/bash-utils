@@ -12,5 +12,5 @@ if [ ! -z "$EXISTING_MATCHES" ]; then
 fi
 EOF
 
-find "$PACKAGE_PATH/integration_tests" -type f -name "*.test.*s" |
+find "$PACKAGE_PATH/test/integration" -type f -name "*.test.*s" |
   xargs -I {} sh /tmp/fix_token_type_idx.sh {}

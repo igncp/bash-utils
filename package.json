@@ -13,6 +13,7 @@
     "postinstall": "lerna bootstrap",
     "publish": "sh helpers/publish.sh",
     "run-checks": "bash helpers/run_checks.sh",
+    "sonar": "lerna sonar",
     "test": "npm run build && lerna run test"
   },
   "author": "Ignacio Carbajo <icarbajop@gmail.com>",
@@ -42,8 +43,10 @@
     "flow-coverage-report": "^0.6.0",
     "husky": "^1.0.0-rc.14",
     "jest": "^23.6.0",
+    "jest-coverage-ratchet": "^0.2.3",
     "lerna": "^3.4.0",
     "prettier": "^1.14.3",
+    "sonar-scanner": "^3.1.0",
     "stylelint": "^9.6.0",
     "stylelint-order": "^1.0.0",
     "ts-node": "^7.0.1"
@@ -71,7 +74,7 @@
     "globIncludePatterns": [
       "packages/**/src/**/*.js"
     ],
-    "threshold": 70,
+    "threshold": 89,
     "reportTypes": [
       "html"
     ]

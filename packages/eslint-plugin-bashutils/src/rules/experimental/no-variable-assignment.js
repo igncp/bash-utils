@@ -1,6 +1,6 @@
 // @flow
 
-import { type T_Rule } from '../../types'
+import type { T_Rule } from '../../types'
 
 const rule: T_Rule = {
   meta: {

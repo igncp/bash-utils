@@ -1,4 +1,8 @@
+// @flow
+
 import { tokens } from '@bash-utils/parser'
+
+import type { T_Rule } from '../../types'
 
 /**
  * Requires adding a shebang in the top of the script
@@ -26,7 +30,7 @@ import { tokens } from '@bash-utils/parser'
 
 const MESSAGE_MISSING = 'Missing Shebang'
 
-const rule = {
+const rule: T_Rule = {
   meta: {
     docs: {
       description: 'This rules enforces the presence of a shebang',
@@ -69,7 +73,7 @@ const rule = {
 }
 
 if (global.__TEST__) {
-  rule._test = {
+  ;(rule: any)._test = {
     MESSAGE_MISSING,
   }
 }
