@@ -6,6 +6,8 @@ import { walk } from '../../src/CSTVisitors/estree/walker'
 
 const debug = false
 
+const getIsValidNumber = v => typeof v === 'number' && isNaN(v) === false
+
 const getIsPos1Before2 = (pos1, pos2) =>
   pos1.line < pos2.line ||
   (pos1.line === pos2.line && pos1.column < pos2.column)
@@ -47,14 +49,22 @@ const validateRangesAndLocsForArr = (arr, allArrays = []) => {
   arr.forEach((item, idx) => {
     const prevItem = arr[idx - 1]
 
-    if (item.type === 'EOF') {
-      return
-    }
-
     try {
+      expect(!item.parent).toEqual(true)
+
+      if (item.type === 'EOF') {
+        expect(typeof item.range[0] === 'undefined').toEqual(true)
+        expect(typeof item.range[1] === 'undefined').toEqual(true)
+
+        return
+      }
+
       // lines are always 1-based
       expect(item.loc.start.line).not.toEqual(0)
       expect(item.loc.end.line).not.toEqual(0)
+
+      expect(getIsValidNumber(item.range[0])).toEqual(true)
+      expect(getIsValidNumber(item.range[1])).toEqual(true)
 
       expect(item.range[0] >= 0).toEqual(true)
       expect(item.range[1] >= 0).toEqual(true)

@@ -229,6 +229,9 @@ const visitTreeToParseStrings = (tree, visitAllRecursive) => {
           })
 
           bodyItem.body = [multipleCommand]
+
+          multipleCommand.parent = bodyItem
+          multipleCommand.parentKey = 'body'
         })
 
         replaceItemInParent(item, newNode)

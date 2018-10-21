@@ -3,18 +3,23 @@
 // with the addition of: it will ignore a few keys: 'parent', 'tokens' and
 // 'comments'
 
+const childKeys = {}
+
 export function walk(
   ast,
   // tslint:disable-next-line
   { enter, leave }: { enter?: Function; leave?: Function }
 ) {
+  // sometimes new keys are created so can't use the cache
+  Object.keys(childKeys).forEach(childKey => {
+    delete childKeys[childKey]
+  })
+
   visit(ast, null, enter, leave, undefined, undefined)
 }
 
 let shouldSkip = false
 const context = { skip: () => (shouldSkip = true) }
-
-export const childKeys = {}
 
 const toString = Object.prototype.toString
 

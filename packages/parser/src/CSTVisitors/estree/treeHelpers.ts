@@ -79,7 +79,7 @@ export const sortByRange = (a, b) => {
 export const updatePositions = (item, baseRange, basePos) => {
   walk(item, {
     enter(subItem) {
-      if (!subItem.range) {
+      if (!subItem.range || subItem.range.length === 0) {
         return
       }
 

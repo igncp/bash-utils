@@ -103,6 +103,7 @@ esac`,
   })
 
   test('strings', () => {
+    check('"$()"')
     check('foo"a"', { containingTokens: [tokens.STRING, tokens.IDENTIFIER] })
     check('echo "$@@@"')
     check('echo "$@"')
