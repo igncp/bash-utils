@@ -1,6 +1,5 @@
 // @flow
 
-import JSONTree from 'react-json-tree'
 import React, { Component } from 'react'
 import { buildESTreeAstFromSource } from '@bash-utils/parser'
 import SyntaxHighlighter from 'react-syntax-highlighter'
@@ -9,7 +8,8 @@ import AceEditor from 'react-ace'
 
 import pjson from '../package.json'
 
-import jsonTreeTheme from './jsonTreeTheme'
+import TreeView from './TreeView'
+import type { T_ESTreeItem } from './types'
 import './App.css'
 
 import 'brace/mode/sh'
@@ -25,7 +25,11 @@ type T_Props = {||}
 
 type T_State = {|
   bashInputValue: string,
-  estreeOutputValue: string,
+  cursorPos: {|
+    column: number,
+    line: number,
+  |},
+  estreeOutputValue: string | T_ESTreeItem,
 |}
 
 const HeaderLink = ({ children, href }) => {
@@ -40,6 +44,7 @@ class App extends Component<T_Props, T_State> {
   state = {
     bashInputValue: '',
     estreeOutputValue: '',
+    cursorPos: { line: 1, column: 1 },
   }
 
   componentDidMount() {
@@ -61,6 +66,15 @@ class App extends Component<T_Props, T_State> {
 
   handleBashInputChange = (value: string) => {
     this.updateBoxes(value)
+  }
+
+  handleCursorChange = (data: any) => {
+    this.setState({
+      cursorPos: {
+        line: data.lead.row + 1,
+        column: data.lead.column + 1,
+      },
+    })
   }
 
   render() {
@@ -99,7 +113,7 @@ class App extends Component<T_Props, T_State> {
             {'ESLint Rules Tests Coverage'}
           </HeaderLink>
         </p>
-        <p>{'You can try the result of the parser and ESTree visitor:'}</p>
+        <p>{`You can try the result of the parser and ESTree visitor:`}</p>
         <div className="inputs-container">
           <div className="bash-input">
             <AceEditor
@@ -108,6 +122,7 @@ class App extends Component<T_Props, T_State> {
               mode="sh"
               name="UNIQUE_ID_OF_DIV"
               onChange={this.handleBashInputChange}
+              onCursorChange={this.handleCursorChange}
               theme="github"
               value={this.state.bashInputValue}
             />
@@ -122,9 +137,12 @@ class App extends Component<T_Props, T_State> {
             </SyntaxHighlighter>
           </div>
         </div>
-        <div className="json-tree-wrapper">
-          <JSONTree data={this.state.estreeOutputValue} theme={jsonTreeTheme} />
+        <div className="cursor-pos-wrapper">
+          <span className="cursor-pos">{`${this.state.cursorPos.line},${
+            this.state.cursorPos.column
+          }`}</span>
         </div>
+        <TreeView data={this.state.estreeOutputValue} />
         <footer target="_blank">
           <a href="https://github.com/igncp/bash-utils/tree/master/packages/website">
             {'Source'}

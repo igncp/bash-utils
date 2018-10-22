@@ -2,6 +2,7 @@ import { getDummyCSTVisitor } from './CSTVisitors/dummy'
 import {
   getESTreeConverterVisitor,
   visitorKeys as visitorKeysForESTree,
+  walkESTree,
 } from './CSTVisitors/estree'
 import { parse } from './parse'
 import * as exposedTokens from './tokens'
@@ -28,4 +29,5 @@ export {
   visitorKeysForESTree,
   parse,
   exposedTokens as tokens,
+  walkESTree,
 }

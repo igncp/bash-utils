@@ -2,7 +2,7 @@
 
 import { tokens } from '@bash-utils/parser'
 
-import type { T_Rule } from '../../types'
+import type { T_Rule, T_ESTreeProgramNode } from '../../types'
 
 /**
  * Requires adding a shebang in the top of the script
@@ -28,19 +28,20 @@ import type { T_Rule } from '../../types'
 // eslint transforms shebangs to comments in the code passed to the parser
 // Can't use here the Shebang node type
 
-const MESSAGE_MISSING = 'Missing Shebang'
-
 const rule: T_Rule = {
   meta: {
     docs: {
       description: 'This rules enforces the presence of a shebang',
+    },
+    messages: {
+      missing: 'Missing Shebang',
     },
   },
   create(ctx) {
     const { text } = ctx.getSourceCode()
 
     return {
-      Program(node) {
+      Program(node: T_ESTreeProgramNode) {
         let found = false
 
         for (let i = 0; i < node.tokens.length; i++) {
@@ -60,7 +61,7 @@ const rule: T_Rule = {
 
         if (!found) {
           ctx.report({
-            message: MESSAGE_MISSING,
+            messageId: 'missing',
             loc: {
               end: { line: 1, column: 1 },
               start: { line: 1, column: 1 },
@@ -70,12 +71,6 @@ const rule: T_Rule = {
       },
     }
   },
-}
-
-if (global.__TEST__) {
-  ;(rule: any)._test = {
-    MESSAGE_MISSING,
-  }
 }
 
 export default rule

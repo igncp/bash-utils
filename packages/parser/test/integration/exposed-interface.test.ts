@@ -15,6 +15,7 @@ describe('exposedInterface', () => {
       parse,
       tokens: allTokens,
       visitorKeysForESTree,
+      walkESTree: expect.any(Function),
     })
   })
 

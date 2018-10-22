@@ -42,3 +42,21 @@ footer {
   margin: 20px 0;
   text-align: center;
 }
+
+.search-box {
+  border: 1px solid #ccc;
+  margin: 15px 0 10px;
+  width: 100%;
+}
+
+.cursor-pos {
+  bottom: -15px;
+  color: #777;
+  font-size: 12px;
+  left: 41px;
+  position: absolute;
+}
+
+.cursor-pos-wrapper {
+  position: relative;
+}

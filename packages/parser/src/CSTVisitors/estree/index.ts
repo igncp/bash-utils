@@ -10,6 +10,8 @@ import { getRemoveParentVistor } from './removeParentVisitor'
 import { getShebangVisitor, shebangVisitorKeysObj } from './shebangVisitor'
 import { getStringsVisitor } from './stringsVisitor'
 
+import { walk } from './walker'
+
 const VISITORS_FACTORIES = [
   getBaseVisitor,
   getBacktickVisitor,
@@ -47,3 +49,5 @@ export const visitorKeys = {
   ...assignmentsVisitorKeysObj,
   ...shebangVisitorKeysObj,
 }
+
+export const walkESTree = walk

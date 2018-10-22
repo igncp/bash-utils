@@ -2,10 +2,8 @@ import rule from '../require-shebang'
 
 import { runTest, ruleTestMapper } from '../../../../helpers/testsHelpers'
 
-const { MESSAGE_MISSING } = rule._test
-
 const expectedErrorMessageMissing = {
-  message: MESSAGE_MISSING || 'ERROR',
+  messageId: 'missing',
 }
 
 runTest('require-shebang', rule, {
