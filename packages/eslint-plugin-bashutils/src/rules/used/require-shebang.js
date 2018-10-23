@@ -1,8 +1,7 @@
 // @flow
 
 import { tokens } from '@bash-utils/parser'
-
-import type { T_Rule, T_ESTreeProgramNode } from '../../types'
+import type { T_Rule, T_ESTreeProgramNode } from '@bash-utils/parser'
 
 /**
  * Requires adding a shebang in the top of the script

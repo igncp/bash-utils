@@ -30,8 +30,7 @@
  */
 
 import { tokens } from '@bash-utils/parser'
-
-import type { T_Rule, T_ESTreeNode } from '../../types'
+import type { T_Rule, T_ESTreeNode } from '@bash-utils/parser'
 
 const availableSetOptions = ['-a', '-e', '-x']
 

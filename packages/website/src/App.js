@@ -2,6 +2,7 @@
 
 import React, { Component } from 'react'
 import { buildESTreeAstFromSource } from '@bash-utils/parser'
+import type { T_ESTreeItem } from '@bash-utils/parser'
 import SyntaxHighlighter from 'react-syntax-highlighter'
 import { atomOneLight as hljsStyle } from 'react-syntax-highlighter/styles/hljs'
 import AceEditor from 'react-ace'
@@ -9,7 +10,6 @@ import AceEditor from 'react-ace'
 import pjson from '../package.json'
 
 import TreeView from './TreeView'
-import type { T_ESTreeItem } from './types'
 import './App.css'
 
 import 'brace/mode/sh'

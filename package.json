@@ -13,7 +13,8 @@
     "postinstall": "lerna bootstrap",
     "publish": "sh helpers/publish.sh",
     "run-checks": "bash helpers/run_checks.sh",
-    "sonar": "lerna sonar",
+    "sonar-run": "lerna run sonar",
+    "sonar-start-docker": "docker run -d --name sonarqube -p 9000:9000 -p 9092:9092 sonarqube",
     "test": "npm run build && lerna run test"
   },
   "author": "Ignacio Carbajo <icarbajop@gmail.com>",

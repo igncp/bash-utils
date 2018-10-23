@@ -6,6 +6,7 @@
 
 [libs]
 helpers/flowtype/customDefinitions.js
+packages/parser/src/flow-types.js
 
 [lints]
 

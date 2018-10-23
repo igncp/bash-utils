@@ -1,6 +1,6 @@
 // @flow
 
-import type { T_Rule, T_ESTreeProgramNode } from '../../types'
+import type { T_Rule, T_ESTreeProgramNode } from '@bash-utils/parser'
 
 const MESSAGE_MULTIPLE = 'Multiple spaces are not allowd'
 

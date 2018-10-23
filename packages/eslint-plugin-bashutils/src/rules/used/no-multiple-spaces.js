@@ -18,7 +18,7 @@
  * @module No Multiple Spaces
  */
 
-import type { T_Rule, T_ESTreeProgramNode } from '../../types'
+import type { T_Rule, T_ESTreeProgramNode } from '@bash-utils/parser'
 
 const rule: T_Rule = {
   meta: {

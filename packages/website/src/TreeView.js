@@ -3,10 +3,10 @@
 import JSONTree from 'react-json-tree'
 import React from 'react'
 import { walkESTree } from '@bash-utils/parser'
+import type { T_ESTreeItem } from '@bash-utils/parser'
 
 import jsonTreeTheme from './jsonTreeTheme'
 import SelectBox from './SelectBox'
-import type { T_ESTreeItem } from './types'
 
 const getIsItemNode = item => !!item && typeof item === 'object' && !!item.type
 
@@ -18,7 +18,7 @@ const searchTypeToPlaceholderMap = {
   eval:
     "You can type a JavaScript expression to filter using 'n' as the node. E.g.: n.value === 'echo' || n.range[0] > 10",
   valueAndType:
-    'You can type a string and it will matched with the node types and values',
+    'You can type a string and it will be matched with the node types and values',
 }
 
 type T_Props = {|
