@@ -18,6 +18,7 @@ const visitTreeToExtractPE = (tree, visitAllRecursive) => {
       // is important to check for `item.parent` as the token will
       // pass through here twice
       if (item.type === allTokens.IDENTIFIER.tokenName && item.parent) {
+        // tslint:disable-next-line no-invalid-template-strings
         if (item.value.substr(0, 2) !== '${') {
           return
         }
