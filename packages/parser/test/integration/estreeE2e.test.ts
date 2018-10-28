@@ -1,7 +1,4 @@
-import { readdir, readFileSync, writeFileSync } from 'fs'
-
-import { buildESTreeAstFromSource, parse, tokens } from '../../src'
-import { getESTreeConverterVisitor } from '../../src/CSTVisitors/estree'
+import { parse, tokens } from '../../src'
 
 import { check, checkAllFilesInDir } from './checkESTree'
 

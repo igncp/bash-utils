@@ -1,12 +1,12 @@
 import { readdirSync, readFileSync, writeFileSync } from 'fs'
 
-import { buildESTreeAstFromSource, parse } from '../../src'
+import { parse } from '../../src'
 import { getESTreeConverterVisitor } from '../../src/CSTVisitors/estree'
 import { walk } from '../../src/CSTVisitors/estree/walker'
 
 const debug = false
 
-const getIsValidNumber = v => typeof v === 'number' && isNaN(v) === false
+const getIsValidNumber = v => typeof v === 'number' && !isNaN(v)
 
 const getIsPos1Before2 = (pos1, pos2) =>
   pos1.line < pos2.line ||
@@ -44,7 +44,7 @@ const runCustomFnOnTree = ({ treeResult, traverseFn }) => {
 const validateRangesAndLocsForArr = (arr, allArrays = []) => {
   const restItems = allArrays
     .filter(a => a !== arr)
-    .reduce((acc, a) => a.concat(a), [])
+    .reduce((_, a) => a.concat(a), [])
 
   arr.forEach((item, idx) => {
     const prevItem = arr[idx - 1]
@@ -131,7 +131,7 @@ const writeDebugFile = (filename, value) => {
   )
 }
 
-const getNodeVisitedFn = ({ value, treeResult }) => nodeName => {
+const getNodeVisitedFn = ({ treeResult }) => nodeName => {
   if (!nodeName) {
     throw new Error(`Invalid nodeName: ${nodeName}`)
   }
@@ -218,7 +218,7 @@ export const check = (
       writeDebugFile('visitor-result', treeResult)
     }
 
-    const getNodeVisited = getNodeVisitedFn({ value, treeResult })
+    const getNodeVisited = getNodeVisitedFn({ treeResult })
 
     containingNodes.forEach(nodeName => {
       expect(getNodeVisited(nodeName)).toEqual(true)
