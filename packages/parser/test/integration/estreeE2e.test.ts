@@ -363,6 +363,6 @@ grep bar`
   // till the parser is stable enough, this has to be skipped.
   // at the time of writing: failing 9 of 28 files
   checkAllFilesInDir('copied_fixture_files', {
-    skip: ['sample-12', 'sample-24', 'sample-3', 'sample-5'],
+    skip: ['sample-7', 'sample-17', 'sample-23', 'sample-24'],
   })
 })
