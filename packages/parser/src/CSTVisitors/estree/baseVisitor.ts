@@ -160,6 +160,7 @@ const baseVisitorKeysWithBody = [
   'IfExpression',
   'Literal',
   'MultipleCommand',
+  'WhileExpression',
   'MultipleCommandWithTerminator',
   'ParameterExpansion',
   'Pipeline',

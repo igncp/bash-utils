@@ -23,6 +23,21 @@ export const REDIRECTION_FORWARD_DOUBLE = createToken({
   pattern: '>>',
 })
 
+export const WHILE = createToken({
+  longer_alt: IDENTIFIER,
+  name: 'WHILE',
+  pattern: 'while',
+})
+export const DONE = createToken({
+  longer_alt: IDENTIFIER,
+  name: 'DONE',
+  pattern: 'done',
+})
+export const DO = createToken({
+  longer_alt: IDENTIFIER,
+  name: 'DO',
+  pattern: 'do',
+})
 export const IF = createToken({
   longer_alt: IDENTIFIER,
   name: 'IF',
@@ -173,6 +188,9 @@ export const ALL_TOKENS = [
   THEN,
   ELSE,
   ELIF,
+  WHILE,
+  DONE,
+  DO,
   SQ_BRACKET_2_LEFT,
   SQ_BRACKET_2_RIGHT,
   SQ_BRACKET_LEFT,

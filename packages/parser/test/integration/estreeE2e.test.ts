@@ -76,10 +76,6 @@ describe('non parse errors', () => {
       containingNodes: ['SelectExpression'],
       errorsOnChecks: true,
     })
-    check('while true; do sleep 1; echo foo; done', {
-      containingNodes: ['WhileExpression'],
-      errorsOnChecks: true,
-    })
     check(
       `
 case $FOO in
@@ -93,6 +89,15 @@ case $FOO in
   BAR="BAZ"
   ;;
 esac`,
+      { throws: true }
+    )
+    check('fun1() { echo foo; }; fun1', { throws: true })
+    check('function fun1 { echo foo; }; fun1', { throws: true })
+    check(
+      `cat >> .gitignore <<"EOF"
+*.log
+*.tgz
+EOF`,
       { throws: true }
     )
   })
@@ -259,6 +264,30 @@ grep bar`
   })
 
   test('substitutions and expansions', () => {
+    check('$() $()', {
+      containsNumWhere: [
+        {
+          fn: n => n.type === 'CommandSubstitutionGroup',
+          num: 2,
+        },
+      ],
+    })
+    check('a$(echo b)c a$(echo b)c', {
+      containsNumWhere: [
+        {
+          fn: n => n.type === 'CommandSubstitutionGroup',
+          num: 2,
+        },
+      ],
+    })
+    check('a$(echo b)ca$(echo b)c', {
+      containsNumWhere: [
+        {
+          fn: n => n.type === 'CommandSubstitutionGroup',
+          num: 1,
+        },
+      ],
+    })
     check('echo <(cat foo.txt)', {
       containingNodes: ['ProcessSubstitution'],
       missingNodes: ['CommandSubstitution', 'ParameterExpansion'],
@@ -287,7 +316,14 @@ grep bar`
     })
     check('echo $()')
     check('echo $( $( echo foo ) )')
-    check('if [ $() $() -z bar ]; then bar; fi')
+    check('if [ $() $() -z bar ]; then bar; fi', {
+      containsNumWhere: [
+        {
+          fn: n => n.type === 'CommandSubstitutionGroup',
+          num: 2,
+        },
+      ],
+    })
     check('if [ `` `` `` -z bar ]; then bar; fi')
     check('`foo`', { containingTokens: [tokens.IDENTIFIER] })
     check('echo `# foo` bar', {
@@ -332,6 +368,12 @@ grep bar`
     )
   })
 
+  test('while expressions', () => {
+    check('while true; do sleep 1; echo foo; done', {
+      containingNodes: ['WhileExpression'],
+    })
+  })
+
   test('pipes', () => {
     check('echo | echo', { containingNodes: ['Pipeline'] })
     check('find . | grep foo', { containingNodes: ['Pipeline'] })
@@ -363,6 +405,6 @@ grep bar`
   // till the parser is stable enough, this has to be skipped.
   // at the time of writing: failing 9 of 28 files
   checkAllFilesInDir('copied_fixture_files', {
-    skip: ['sample-7', 'sample-17', 'sample-23', 'sample-24'],
+    skip: ['sample-7', 'sample-23', 'sample-24'],
   })
 })

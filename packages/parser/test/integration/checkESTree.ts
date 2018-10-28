@@ -279,14 +279,24 @@ export const check = (
 
 export const checkAllFilesInDir = (
   relFilesPath,
-  opts: { skip?: string[] } = {}
+  opts: { skip?: string[]; testOnly?: string[] } = {}
 ) => {
-  // add (dot)only when testing locally - should not be possible to be committed
-  const describeFn = opts.skip ? describe : describe
-
-  describeFn(relFilesPath, () => {
+  describe(relFilesPath, () => {
     const filesPath = `${__dirname}/${relFilesPath}`
     const files = readdirSync(filesPath)
+
+    const getTestFn = shouldSkip => {
+      if (shouldSkip) {
+        return test.skip
+      }
+
+      if (opts.testOnly) {
+        // add (dot)only here (should not be possible to commit)
+        return test
+      }
+
+      return test
+    }
 
     files
       .filter(fileName => {
@@ -294,10 +304,11 @@ export const checkAllFilesInDir = (
       })
       .forEach(fileName => {
         const parsedFileName = fileName.replace('.sh', '')
-        const shouldSkip = opts.skip
-          ? opts.skip.indexOf(parsedFileName) !== -1
-          : false
-        const testFn = shouldSkip ? test.skip : test
+        const shouldSkip = !!(
+          (opts.skip && opts.skip.indexOf(parsedFileName) !== -1) ||
+          (opts.testOnly && opts.testOnly.indexOf(parsedFileName) === -1)
+        )
+        const testFn = getTestFn(shouldSkip)
 
         testFn(`${relFilesPath}/${fileName}`, () => {
           const fileContent = readFileSync(`${filesPath}/${fileName}`, 'utf-8')

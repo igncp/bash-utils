@@ -9,6 +9,8 @@ import {
   COMMENT,
   CURLY_BRACKET_LEFT,
   CURLY_BRACKET_RIGHT,
+  DO,
+  DONE,
   FI,
   IDENTIFIER,
   IF,
@@ -28,6 +30,7 @@ import {
   SQ_BRACKET_RIGHT,
   STRING,
   THEN,
+  WHILE,
 } from './tokens'
 
 const Lexer = new ChevLexer(ALL_TOKENS, {
@@ -172,14 +175,45 @@ export class Parser extends ChevParser {
   protected CommandSubstitutionGroup = this.RULE(
     'CommandSubstitutionGroup',
     () => {
-      this.AT_LEAST_ONE(() => {
-        // this.OPTION(() => {
-        // this.SUBRULE(this.Literal)
-        // })
-        this.SUBRULE(this.CommandSubstitution)
-        // this.OPTION1(() => {
-        // this.SUBRULE1(this.Literal)
-        // })
+      let occurrence = 0
+
+      const getDoesNotHaveSeparationFn = minOccurrence => () => {
+        if (occurrence < minOccurrence) {
+          return true
+        }
+
+        const prevToken = this.LA(0)
+        const currentToken = this.LA(1)
+
+        if (isNaN(currentToken.startOffset) || isNaN(prevToken.startOffset)) {
+          return true
+        }
+
+        const diff =
+          currentToken.startOffset -
+          (prevToken.startOffset + prevToken.image.length)
+
+        return diff === 0
+      }
+
+      this.AT_LEAST_ONE({
+        DEF: () => {
+          this.MANY(() => {
+            this.SUBRULE(this.Literal)
+          })
+
+          this.SUBRULE(this.CommandSubstitution)
+
+          this.MANY1({
+            DEF: () => {
+              this.SUBRULE1(this.Literal)
+            },
+            GATE: getDoesNotHaveSeparationFn(0),
+          })
+
+          occurrence += 1
+        },
+        GATE: getDoesNotHaveSeparationFn(1),
       })
     }
   )
@@ -227,6 +261,7 @@ export class Parser extends ChevParser {
   protected PipelineBlock = this.RULE('PipelineBlock', () => {
     this.OR([
       { ALT: () => this.SUBRULE(this.SubShell) },
+      { ALT: () => this.SUBRULE(this.WhileExpression) },
       { ALT: () => this.SUBRULE(this.CommandsGroup) },
       { ALT: () => this.SUBRULE(this.ComposedCommand) },
     ])
@@ -277,12 +312,12 @@ export class Parser extends ChevParser {
 
   protected RedirectionA = this.RULE('RedirectionA', () => {
     this.CONSUME(REDIRECTION_FORWARD_SINGLE)
-    this.CONSUME(IDENTIFIER)
+    this.SUBRULE(this.Literal)
   })
 
   protected RedirectionB = this.RULE('RedirectionB', () => {
     this.CONSUME(REDIRECTION_FORWARD_DOUBLE)
-    this.CONSUME(IDENTIFIER)
+    this.SUBRULE(this.Literal)
   })
 
   protected IfConditionGroup = this.RULE('IfConditionGroup', () => {
@@ -335,6 +370,18 @@ export class Parser extends ChevParser {
 
   protected Comment = this.RULE('Comment', () => {
     this.CONSUME(COMMENT)
+  })
+
+  protected WhileExpression = this.RULE('WhileExpression', () => {
+    this.CONSUME(WHILE)
+    this.SUBRULE(this.Command)
+    this.SUBRULE(this.Termination)
+    this.CONSUME(DO)
+    this.OPTION(() => {
+      this.CONSUME(NEWLINE)
+    })
+    this.SUBRULE(this.MultipleCommandWithTerminator)
+    this.CONSUME(DONE)
   })
 
   protected IfExpression = this.RULE('IfExpression', () => {
