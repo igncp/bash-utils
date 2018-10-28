@@ -279,10 +279,10 @@ export const check = (
 
 export const checkAllFilesInDir = (
   relFilesPath,
-  skip: { skipAllExcept?: string[] } = {}
+  opts: { skip?: string[] } = {}
 ) => {
   // add (dot)only when testing locally - should not be possible to be committed
-  const describeFn = skip.skipAllExcept ? describe : describe
+  const describeFn = opts.skip ? describe : describe
 
   describeFn(relFilesPath, () => {
     const filesPath = `${__dirname}/${relFilesPath}`
@@ -294,8 +294,8 @@ export const checkAllFilesInDir = (
       })
       .forEach(fileName => {
         const parsedFileName = fileName.replace('.sh', '')
-        const shouldSkip = skip.skipAllExcept
-          ? skip.skipAllExcept.indexOf(parsedFileName) === -1
+        const shouldSkip = opts.skip
+          ? opts.skip.indexOf(parsedFileName) !== -1
           : false
         const testFn = shouldSkip ? test.skip : test
 

@@ -1,8 +1,9 @@
 import { createToken, Lexer } from 'chevrotain'
 
+// Using the negative lookahead to avoid matching commang substitution
 export const IDENTIFIER = createToken({
   name: 'IDENTIFIER',
-  pattern: /[A-Za-z_\-0-9\{\}=?+\/.$@~%!\]\[#]+/,
+  pattern: /([A-Za-z_\-0-9\{\}=?+\/.@~%!\]\[#*]|\$(?!\())+/,
 })
 
 export const TERMINATOR = createToken({ name: 'TERMINATOR', pattern: Lexer.NA })

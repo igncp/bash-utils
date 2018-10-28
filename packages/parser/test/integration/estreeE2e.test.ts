@@ -76,6 +76,10 @@ describe('non parse errors', () => {
       containingNodes: ['SelectExpression'],
       errorsOnChecks: true,
     })
+    check('while true; do sleep 1; echo foo; done', {
+      containingNodes: ['WhileExpression'],
+      errorsOnChecks: true,
+    })
     check(
       `
 case $FOO in
@@ -91,12 +95,6 @@ case $FOO in
 esac`,
       { throws: true }
     )
-    check('$(echo bar)a$(echo baz)', {
-      containsNumWhere: [
-        { num: 2, fn: node => node.type === 'CommandSubstitution' },
-      ],
-      throws: true,
-    })
   })
 
   test('strings', () => {
@@ -265,6 +263,11 @@ grep bar`
       containingNodes: ['ProcessSubstitution'],
       missingNodes: ['CommandSubstitution', 'ParameterExpansion'],
     })
+    check('$(echo bar)a$(echo baz)', {
+      containsNumWhere: [
+        { num: 2, fn: node => node.type === 'CommandSubstitution' },
+      ],
+    })
     check('$(echo bar)$(echo baz)', {
       containsNumWhere: [
         { num: 2, fn: node => node.type === 'CommandSubstitution' },
@@ -359,5 +362,7 @@ grep bar`
 
   // till the parser is stable enough, this has to be skipped.
   // at the time of writing: failing 9 of 28 files
-  checkAllFilesInDir('copied_fixture_files', { skipAllExcept: [] })
+  checkAllFilesInDir('copied_fixture_files', {
+    skip: ['sample-12', 'sample-24', 'sample-3', 'sample-5'],
+  })
 })
