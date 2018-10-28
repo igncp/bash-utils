@@ -13,7 +13,7 @@ const getNextPossibleVariableName = (text, chIdx) => {
   const remainingText = text.substr(chIdx, text.length)
   let variableName = ''
 
-  for (var i = 0; i < remainingText.length; i++) {
+  for (let i = 0; i < remainingText.length; i++) {
     const ch = remainingText[i]
 
     if (!getIsValidVariableName(ch)) {

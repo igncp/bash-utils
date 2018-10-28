@@ -172,7 +172,15 @@ export class Parser extends ChevParser {
   protected CommandSubstitutionGroup = this.RULE(
     'CommandSubstitutionGroup',
     () => {
-      this.SUBRULE(this.CommandSubstitution)
+      this.AT_LEAST_ONE(() => {
+        // this.OPTION(() => {
+        // this.SUBRULE(this.Literal)
+        // })
+        this.SUBRULE(this.CommandSubstitution)
+        // this.OPTION1(() => {
+        // this.SUBRULE1(this.Literal)
+        // })
+      })
     }
   )
 

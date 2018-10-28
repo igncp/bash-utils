@@ -4,30 +4,17 @@
 // 'comments'
 
 const childKeys = {}
-
-export function walk(
-  ast,
-  // tslint:disable-next-line
-  { enter, leave }: { enter?: Function; leave?: Function }
-) {
-  // sometimes new keys are created so can't use the cache
-  Object.keys(childKeys).forEach(childKey => {
-    delete childKeys[childKey]
-  })
-
-  visit(ast, null, enter, leave, undefined, undefined)
-}
-
 let shouldSkip = false
+
 const context = { skip: () => (shouldSkip = true) }
 
 const toString = Object.prototype.toString
 
-function isArray(thing) {
+const isArray = thing => {
   return toString.call(thing) === '[object Array]'
 }
 
-function visit(node, parent, enter, leave, prop, index) {
+const visit = (node, parent, enter, leave, prop, index) => {
   if (!node) {
     return
   }
@@ -56,8 +43,11 @@ function visit(node, parent, enter, leave, prop, index) {
     const key = keys[i]
     const value = node[key]
 
-    if (key === 'parent' || key === 'tokens' || key === 'comments') {
-      continue
+    switch (key) {
+      case 'parent':
+      case 'tokens':
+      case 'comments':
+        continue
     }
 
     if (isArray(value)) {
@@ -72,4 +62,17 @@ function visit(node, parent, enter, leave, prop, index) {
   if (leave) {
     leave(node, parent, prop, index)
   }
+}
+
+export const walk = (
+  ast,
+  // tslint:disable-next-line
+  { enter, leave }: { enter?: Function; leave?: Function }
+) => {
+  // sometimes new keys are created so can't use the cache
+  Object.keys(childKeys).forEach(childKey => {
+    delete childKeys[childKey]
+  })
+
+  visit(ast, null, enter, leave, undefined, undefined)
 }

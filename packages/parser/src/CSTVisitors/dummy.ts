@@ -8,6 +8,7 @@ export const getDummyCSTVisitor = ({ parser }) => {
       this.validateVisitor()
     }
 
+    // tslint:disable-next-line prefer-function-over-method
     public Script(ctx) {
       return {
         children: ctx,

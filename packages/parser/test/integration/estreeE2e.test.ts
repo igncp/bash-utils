@@ -237,6 +237,7 @@ grep bar`
 
   test('assignments', () => {
     check('FOO=BAR', { containingNodes: ['Assignment'] })
+    check('FOO=', { containingNodes: ['Assignment'] })
     check('FOO=BAR foo', { containingNodes: ['Assignment'] })
     check('FOO=BAR foo > baz', { containingNodes: ['Assignment'] })
     check('FOO=BAR foo bar', { containingNodes: ['Assignment'] })

@@ -6,8 +6,6 @@ PRETTIER_FILES=$(sh helpers/get_prettier_files.sh)
 
 eval "./node_modules/.bin/prettier --list-different $PRETTIER_FILES"
 
-bash helpers/review_tslint_rules.sh
-
 ./node_modules/.bin/eslint .
 
 ./node_modules/.bin/stylelint ./**/*.css

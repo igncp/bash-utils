@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+# this script is not longer used and is kept here in case more rules are added
+
 UNUSED_TSLINT_RULES=$(perl -0 -ne '/("rules":.+?)\}/s && print "$1\n"' packages/parser/tslint.json | \
   tail -n +2 | \
   tr '\n' '@' | \

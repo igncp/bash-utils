@@ -131,6 +131,19 @@ const transformChildrenTo = ({ type, key, ctx, visitor }) => {
   }
 }
 
+const getSameNodeWithParentInChildren = (node, keys) => {
+  keys.forEach(key => {
+    const children = node[key] || []
+
+    children.forEach(child => {
+      child.parent = node
+      child.parentKey = key
+    })
+  })
+
+  return node
+}
+
 const baseVisitorKeysWithBody = [
   'BacktickExpression',
   'Command',
@@ -185,7 +198,7 @@ export const getBaseVisitor = ({ parser }) => {
 
           const node = transformChildrenTo({ type, ctx, key, visitor: this })
 
-          return this.getSameNodeWithParentInChildren(node, [key])
+          return getSameNodeWithParentInChildren(node, [key])
         }
       })
     }
@@ -208,7 +221,7 @@ export const getBaseVisitor = ({ parser }) => {
       const tokens = this.getProgramTokens()
       const comments = this.getProgramComments()
 
-      return this.getSameNodeWithParentInChildren(
+      return getSameNodeWithParentInChildren(
         {
           ...result,
           comments,
@@ -216,19 +229,6 @@ export const getBaseVisitor = ({ parser }) => {
         },
         ['body']
       )
-    }
-
-    public getSameNodeWithParentInChildren(node, keys) {
-      keys.forEach(key => {
-        const children = node[key] || []
-
-        children.forEach(child => {
-          child.parent = node
-          child.parentKey = key
-        })
-      })
-
-      return node
     }
 
     private getProgramTokens() {
