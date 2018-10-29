@@ -12,6 +12,7 @@ import {
   DO,
   DONE,
   FI,
+  FUNCTION,
   IDENTIFIER,
   IF,
   NEWLINE,
@@ -85,6 +86,34 @@ export class Parser extends ChevParser {
     this.OPTION(() => {
       this.SUBRULE(this.Termination)
     })
+  })
+
+  protected FunctionExpression = this.RULE('FunctionExpression', () => {
+    this.OR([
+      {
+        ALT: () => {
+          this.CONSUME(FUNCTION)
+          this.CONSUME(IDENTIFIER)
+          this.OPTION(() => {
+            this.CONSUME(PARENTHESES_LEFT)
+            this.CONSUME(PARENTHESES_RIGHT)
+          })
+        },
+      },
+      {
+        ALT: () => {
+          this.CONSUME1(IDENTIFIER)
+          this.CONSUME1(PARENTHESES_LEFT)
+          this.CONSUME1(PARENTHESES_RIGHT)
+        },
+      },
+    ])
+    this.CONSUME(CURLY_BRACKET_LEFT)
+    this.MANY(() => {
+      this.CONSUME(NEWLINE)
+    })
+    this.SUBRULE(this.MultipleCommandWithTerminator)
+    this.CONSUME(CURLY_BRACKET_RIGHT)
   })
 
   protected MultipleCommandWithTerminator = this.RULE(
@@ -262,6 +291,7 @@ export class Parser extends ChevParser {
     this.OR([
       { ALT: () => this.SUBRULE(this.SubShell) },
       { ALT: () => this.SUBRULE(this.WhileExpression) },
+      { ALT: () => this.SUBRULE(this.FunctionExpression) },
       { ALT: () => this.SUBRULE(this.CommandsGroup) },
       { ALT: () => this.SUBRULE(this.ComposedCommand) },
     ])

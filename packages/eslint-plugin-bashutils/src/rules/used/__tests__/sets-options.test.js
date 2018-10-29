@@ -9,6 +9,11 @@ runTest('sets-options', rule, {
       echo foo`,
       options: [{ included: ['-e'] }],
     },
+    {
+      code: `set -e
+      echo foo`,
+      options: [],
+    },
   ].map(ruleTestMapper),
   invalid: [
     {

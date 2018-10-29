@@ -166,6 +166,7 @@ const baseVisitorKeysWithBody = [
   'Pipeline',
   'PipelineBlock',
   'ProcessSubstitution',
+  'FunctionExpression',
   'Program',
   'Redirection',
   'RedirectionA',
@@ -246,9 +247,21 @@ export const getBaseVisitor = ({ parser }) => {
 
   const visitor = new CSTVisitor()
 
-  return {
+  const returnedObject: {
+    visit: Function
+    _test?: any
+  } = {
     visit(parserResult) {
       return visitor.visit(parserResult)
     },
   }
+
+  // istanbul ignore else
+  if ((global as any).__TEST__) {
+    returnedObject._test = {
+      visitor,
+    }
+  }
+
+  return returnedObject
 }

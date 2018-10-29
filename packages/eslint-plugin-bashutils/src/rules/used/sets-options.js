@@ -128,7 +128,7 @@ const rule: T_Rule = {
   },
   create(ctx) {
     const setExpressions = []
-    const { included = [], excluded = [] } = ctx.options[0]
+    const { included = [], excluded = [] } = ctx.options[0] || {}
     const loc = {
       start: {
         line: 1,

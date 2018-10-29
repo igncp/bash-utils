@@ -2,8 +2,8 @@ import { parse } from '../../parse'
 import * as allTokens from '../../tokens'
 
 import {
+  getRecursiveWalkLeaveFunction,
   replaceItemInParent,
-  sortByRange,
   updatePositions,
 } from './treeHelpers'
 import { walk } from './walker'
@@ -11,7 +11,7 @@ import { walk } from './walker'
 const visitTreeToExtractPE = (tree, visitAllRecursive) => {
   const newTokensToAdd = []
   const newCommentsToAdd = []
-  const stringTokensToRemove = []
+  const tokensToRemove = []
 
   walk(tree, {
     enter(item) {
@@ -64,36 +64,15 @@ const visitTreeToExtractPE = (tree, visitAllRecursive) => {
 
         replaceItemInParent(item, newNode)
         item.parent = null
-        stringTokensToRemove.push(item)
+        tokensToRemove.push(item)
       }
     },
 
-    leave(item) {
-      if (item.type === 'Program') {
-        for (
-          let allTokensIdx = item.tokens.length - 1;
-          allTokensIdx >= 0;
-          allTokensIdx--
-        ) {
-          const token = item.tokens[allTokensIdx]
-          const idxInTokensToRemove = stringTokensToRemove.indexOf(token)
-
-          if (idxInTokensToRemove !== -1) {
-            item.tokens.splice(allTokensIdx, 1)
-          }
-        }
-
-        newTokensToAdd.forEach(t => {
-          item.tokens.push(t)
-        })
-        newCommentsToAdd.forEach(t => {
-          item.comments.push(t)
-        })
-
-        item.tokens.sort(sortByRange)
-        item.comments.sort(sortByRange)
-      }
-    },
+    leave: getRecursiveWalkLeaveFunction({
+      newCommentsToAdd,
+      newTokensToAdd,
+      tokensToRemove,
+    }),
   })
 
   return tree

@@ -22,6 +22,7 @@ module.exports = {
       babelConfig: false,
       diagnostics: false,
     },
+    __TEST__: true,
   },
   coverageThreshold,
 }

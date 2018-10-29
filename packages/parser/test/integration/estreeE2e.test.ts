@@ -91,8 +91,6 @@ case $FOO in
 esac`,
       { throws: true }
     )
-    check('fun1() { echo foo; }; fun1', { throws: true })
-    check('function fun1 { echo foo; }; fun1', { throws: true })
     check(
       `cat >> .gitignore <<"EOF"
 *.log
@@ -121,6 +119,12 @@ EOF`,
       containingNodes: ['CompoundString'],
       containingTokens: [tokens.IDENTIFIER],
     })
+  })
+
+  test('functions', () => {
+    check('function fun1 { echo foo; }; fun1')
+    check('function fun1 () { echo foo; }; fun1')
+    check('fun1 () { echo foo; }; fun1')
   })
 
   test('strings interpolation', () => {
@@ -199,6 +203,14 @@ grep bar`
     check('foo # bar $(( "', {
       containingNodes: ['Comment', 'Command'],
     })
+    check(`function foo (){
+      # foo bar
+      echo foo bar
+    }`)
+    check(`function foo (){
+      echo foo bar
+      # foo bar
+    }`)
   })
 
   test('simple commands', () => {
@@ -405,6 +417,6 @@ grep bar`
   // till the parser is stable enough, this has to be skipped.
   // at the time of writing: failing 9 of 28 files
   checkAllFilesInDir('copied_fixture_files', {
-    skip: ['sample-7', 'sample-23', 'sample-24'],
+    skip: ['sample-7', 'sample-24', 'sample-25'],
   })
 })

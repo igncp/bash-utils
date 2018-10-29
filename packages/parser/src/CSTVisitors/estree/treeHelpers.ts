@@ -100,3 +100,36 @@ export const updatePositions = (item, baseRange, basePos) => {
 export const getIsValidVariableName = text => {
   return /^[A-Za-z_]+$/.test(text)
 }
+
+export const getRecursiveWalkLeaveFunction = ({
+  newTokensToAdd,
+  newCommentsToAdd,
+  tokensToRemove,
+}) => {
+  return item => {
+    if (item.type === 'Program') {
+      for (
+        let allTokensIdx = item.tokens.length - 1;
+        allTokensIdx >= 0;
+        allTokensIdx--
+      ) {
+        const token = item.tokens[allTokensIdx]
+        const idxInTokensToRemove = tokensToRemove.indexOf(token)
+
+        if (idxInTokensToRemove !== -1) {
+          item.tokens.splice(allTokensIdx, 1)
+        }
+      }
+
+      newTokensToAdd.forEach(t => {
+        item.tokens.push(t)
+      })
+      newCommentsToAdd.forEach(t => {
+        item.comments.push(t)
+      })
+
+      item.tokens.sort(sortByRange)
+      item.comments.sort(sortByRange)
+    }
+  }
+}

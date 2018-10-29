@@ -140,6 +140,11 @@ export const AMPERSAND = createToken({
   name: 'AMPERSAND',
   pattern: '&',
 })
+export const FUNCTION = createToken({
+  longer_alt: IDENTIFIER,
+  name: 'FUNCTION',
+  pattern: 'function',
+})
 
 const WHITESPACE = createToken({
   group: Lexer.SKIPPED,
@@ -189,6 +194,7 @@ export const ALL_TOKENS = [
   ELSE,
   ELIF,
   WHILE,
+  FUNCTION,
   DONE,
   DO,
   SQ_BRACKET_2_LEFT,
