@@ -1,6 +1,6 @@
 language: node_js
 node_js:
-  - "10.4.1"
+  - "10.13.0"
   #10.0.0-10.2.x have a strange bug where node_modules are sometimes not available
   - "10.3.0"
   - "8.12.0"
