@@ -15,8 +15,11 @@ eval "./node_modules/.bin/prettier --list-different $PRETTIER_FILES"
 ./node_modules/.bin/lerna run lint
 
 TODOS=$(find . -type f ! -path "*node_modules*" ! -path "*.git/*" | \
-  grep -v coverage | \
-  grep -v dist | \
+  grep -v '/coverage/' | \
+  grep -v '/flow-coverage/' | \
+  grep -v '/dist/' | \
+  grep -v '/lib/' | \
+  grep -v '/copied_fixture_files/' | \
   xargs grep '@TODO' | \
   grep -v 'lint.sh')
 
