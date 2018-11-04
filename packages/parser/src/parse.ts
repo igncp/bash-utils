@@ -13,6 +13,7 @@ import {
   DONE,
   FI,
   FUNCTION,
+  HERE_DOCUMENT,
   IDENTIFIER,
   IF,
   NEWLINE,
@@ -24,6 +25,7 @@ import {
   PROCESS_SUBSTITUTION_LT_LEFT,
   REDIRECTION_FORWARD_DOUBLE,
   REDIRECTION_FORWARD_SINGLE,
+  REDIRECTION_HERE_STRING,
   SEMICOLON,
   SQ_BRACKET_2_LEFT,
   SQ_BRACKET_2_RIGHT,
@@ -44,8 +46,10 @@ const reservedWords = [
   CURLY_BRACKET_LEFT,
   CURLY_BRACKET_RIGHT,
   DONE,
-  FUNCTION,
   FI,
+  FUNCTION,
+  THEN,
+  WHILE,
 ]
 
 const getIsReservedWord = tokenValue => {
@@ -224,6 +228,10 @@ export class Parser extends ChevParser {
     ])
   })
 
+  protected HereDocument = this.RULE('HereDocument', () => {
+    this.CONSUME(HERE_DOCUMENT)
+  })
+
   protected CommandSubstitutionGroup = this.RULE(
     'CommandSubstitutionGroup',
     () => {
@@ -271,8 +279,16 @@ export class Parser extends ChevParser {
   )
 
   protected Command = this.RULE('Command', () => {
-    this.AT_LEAST_ONE(() => {
-      this.SUBRULE(this.CommandUnit)
+    let idx = 0
+
+    this.AT_LEAST_ONE({
+      DEF: () => {
+        this.SUBRULE(this.CommandUnit)
+        idx++
+      },
+      GATE: () => {
+        return !!idx || !getIsReservedWord(this.LA(1).image)
+      },
     })
 
     this.MANY(() => {
@@ -361,6 +377,9 @@ export class Parser extends ChevParser {
       {
         ALT: () => this.SUBRULE(this.RedirectionB),
       },
+      {
+        ALT: () => this.SUBRULE(this.HereDocument),
+      },
     ])
   })
 
@@ -442,6 +461,12 @@ export class Parser extends ChevParser {
     })
     this.SUBRULE(this.MultipleCommandWithTerminator)
     this.CONSUME(DONE)
+
+    // @TODO: Move this to a more generic rule when clear to what it applies
+    this.OPTION1(() => {
+      this.CONSUME(REDIRECTION_HERE_STRING)
+      this.SUBRULE(this.Literal)
+    })
   })
 
   protected IfExpression = this.RULE('IfExpression', () => {

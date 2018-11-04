@@ -2,11 +2,7 @@
 
 ## Grammar
 
-Important:
-
-- This grammar is simplistic and will need to be extended over time
-- It doesn't contain handling of characters like `.` or `/` that build paths
-- It doesn't take into account additional acepted characters like `-`
+_Important: This grammar was useful to get started but it is not used any more_
 
 - Resources:
 - [Reference Manual](https://www.gnu.org/software/bash/manual/bash.html)

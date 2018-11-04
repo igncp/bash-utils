@@ -61,6 +61,7 @@ describe('parse errors', () => {
     check('echo ( echo )', { throws: true })
     check('${foo', { throws: true })
     check('bar ${foo | bar > baz}', { throws: true })
+    check('done foo', { throws: true })
   })
 
   test('pipelines', () => {
@@ -91,12 +92,15 @@ case $FOO in
 esac`,
       { throws: true }
     )
+  })
+
+  test('here documents', () => {
     check(
       `cat >> .gitignore <<"EOF"
 *.log
 *.tgz
 EOF`,
-      { throws: true }
+      { containingNodes: ['HereDocument'] }
     )
   })
 
@@ -420,9 +424,5 @@ grep bar`
 
   checkAllFilesInDir('fixture_files')
 
-  // till the parser is stable enough, this has to be skipped.
-  // at the time of writing: failing 9 of 28 files
-  checkAllFilesInDir('copied_fixture_files', {
-    skip: ['sample-7', 'sample-24', 'sample-25'],
-  })
+  checkAllFilesInDir('copied_fixture_files')
 })

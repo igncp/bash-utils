@@ -22,6 +22,10 @@ export const REDIRECTION_FORWARD_DOUBLE = createToken({
   name: 'REDIRECTION_FORWARD_DOUBLE',
   pattern: '>>',
 })
+export const REDIRECTION_HERE_STRING = createToken({
+  name: 'REDIRECTION_HERE_STRING',
+  pattern: '<<<',
+})
 
 export const WHILE = createToken({
   categories: IDENTIFIER,
@@ -134,6 +138,10 @@ export const STRING = createToken({
   name: 'STRING',
   pattern: /(["'])((\\{2})*|(.*?[^\\](\\{2})*))\1/,
 })
+export const HERE_DOCUMENT = createToken({
+  name: 'HERE_DOCUMENT',
+  pattern: /<<"([a-zA-Z0-9]+)"[\s\S]*[\n]\1/,
+})
 export const BACKTICK_STRING = createToken({
   name: 'BACKTICK_STRING',
   pattern: /([`])((\\{2})*|(.*?[^\\](\\{2})*))\1/,
@@ -186,6 +194,7 @@ export const ALL_TOKENS = [
   WHITESPACE,
 
   // first
+  HERE_DOCUMENT,
   STRING,
   BACKTICK_STRING,
   COMMENT,
@@ -202,6 +211,7 @@ export const ALL_TOKENS = [
   SEMICOLON,
   REDIRECTION_FORWARD_DOUBLE,
   REDIRECTION_FORWARD_SINGLE,
+  REDIRECTION_HERE_STRING,
   IF,
   PIPE,
   FI,
