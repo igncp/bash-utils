@@ -24,26 +24,31 @@ export const REDIRECTION_FORWARD_DOUBLE = createToken({
 })
 
 export const WHILE = createToken({
+  categories: IDENTIFIER,
   longer_alt: IDENTIFIER,
   name: 'WHILE',
   pattern: 'while',
 })
 export const DONE = createToken({
+  categories: IDENTIFIER,
   longer_alt: IDENTIFIER,
   name: 'DONE',
   pattern: 'done',
 })
 export const DO = createToken({
+  categories: IDENTIFIER,
   longer_alt: IDENTIFIER,
   name: 'DO',
   pattern: 'do',
 })
 export const IF = createToken({
+  categories: IDENTIFIER,
   longer_alt: IDENTIFIER,
   name: 'IF',
   pattern: 'if',
 })
 export const FI = createToken({
+  categories: IDENTIFIER,
   longer_alt: IDENTIFIER,
   name: 'FI',
   pattern: 'fi',
@@ -53,21 +58,25 @@ export const BACKTICK = createToken({
   pattern: /`/,
 })
 export const THEN = createToken({
+  categories: IDENTIFIER,
   longer_alt: IDENTIFIER,
   name: 'THEN',
   pattern: 'then',
 })
 export const ELSE = createToken({
+  categories: IDENTIFIER,
   longer_alt: IDENTIFIER,
   name: 'ELSE',
   pattern: 'else',
 })
 export const ELIF = createToken({
+  categories: IDENTIFIER,
   longer_alt: IDENTIFIER,
   name: 'ELIF',
   pattern: 'elif',
 })
 export const SQ_BRACKET_LEFT = createToken({
+  categories: IDENTIFIER,
   name: 'SQ_BRACKET_LEFT',
   pattern: '[',
 })
@@ -92,23 +101,28 @@ export const PARENTHESES_LEFT = createToken({
   pattern: '(',
 })
 export const CURLY_BRACKET_LEFT = createToken({
+  categories: IDENTIFIER,
   longer_alt: IDENTIFIER,
   name: 'CURLY_BRACKET_LEFT',
   pattern: '{',
 })
 export const CURLY_BRACKET_RIGHT = createToken({
+  categories: IDENTIFIER,
   name: 'CURLY_BRACKET_RIGHT',
   pattern: '}',
 })
 export const SQ_BRACKET_2_LEFT = createToken({
+  categories: IDENTIFIER,
   name: 'SQ_BRACKET_2_LEFT',
   pattern: '[[',
 })
 export const SQ_BRACKET_RIGHT = createToken({
+  categories: IDENTIFIER,
   name: 'SQ_BRACKET_RIGHT',
   pattern: ']',
 })
 export const SQ_BRACKET_2_RIGHT = createToken({
+  categories: IDENTIFIER,
   name: 'SQ_BRACKET_2_RIGHT',
   pattern: ']]',
 })
@@ -141,6 +155,7 @@ export const AMPERSAND = createToken({
   pattern: '&',
 })
 export const FUNCTION = createToken({
+  categories: IDENTIFIER,
   longer_alt: IDENTIFIER,
   name: 'FUNCTION',
   pattern: 'function',

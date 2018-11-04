@@ -40,6 +40,26 @@ const Lexer = new ChevLexer(ALL_TOKENS, {
   positionTracking: 'onlyStart',
 })
 
+const reservedWords = [
+  CURLY_BRACKET_LEFT,
+  CURLY_BRACKET_RIGHT,
+  DONE,
+  FUNCTION,
+  FI,
+]
+
+const getIsReservedWord = tokenValue => {
+  for (let i = 0; i < reservedWords.length; i++) {
+    const word = reservedWords[i]
+
+    if (word.PATTERN === tokenValue) {
+      return true
+    }
+  }
+
+  return false
+}
+
 export class Parser extends ChevParser {
   public Script = this.RULE('Script', () => {
     this.MANY(() => {
@@ -125,14 +145,17 @@ export class Parser extends ChevParser {
         { ALT: () => this.SUBRULE(this.Comment) },
       ])
 
-      this.MANY(() => {
-        this.SUBRULE1(this.Termination)
+      this.MANY({
+        DEF: () => {
+          this.SUBRULE1(this.Termination)
 
-        this.OR1([
-          { ALT: () => this.SUBRULE2(this.IfExpression) },
-          { ALT: () => this.SUBRULE2(this.Pipeline) },
-          { ALT: () => this.SUBRULE2(this.Comment) },
-        ])
+          this.OR1([
+            { ALT: () => this.SUBRULE2(this.IfExpression) },
+            { ALT: () => this.SUBRULE2(this.Pipeline) },
+            { ALT: () => this.SUBRULE2(this.Comment) },
+          ])
+        },
+        GATE: () => !getIsReservedWord(this.LA(2).image),
       })
 
       this.SUBRULE(this.Termination)
@@ -256,8 +279,6 @@ export class Parser extends ChevParser {
       this.OR([
         { ALT: () => this.SUBRULE(this.Redirection) },
         { ALT: () => this.SUBRULE1(this.CommandUnit) },
-        { ALT: () => this.CONSUME(CURLY_BRACKET_LEFT) },
-        { ALT: () => this.CONSUME(CURLY_BRACKET_RIGHT) },
       ])
     })
 
@@ -299,8 +320,11 @@ export class Parser extends ChevParser {
 
   protected CommandsGroup = this.RULE('CommandsGroup', () => {
     this.CONSUME(CURLY_BRACKET_LEFT)
-    this.AT_LEAST_ONE(() => {
-      this.SUBRULE(this.MultipleCommandWithTerminator)
+    this.AT_LEAST_ONE({
+      DEF: () => {
+        this.SUBRULE(this.MultipleCommandWithTerminator)
+      },
+      GATE: () => !getIsReservedWord(this.LA(1).image),
     })
     this.CONSUME(CURLY_BRACKET_RIGHT)
   })
@@ -377,8 +401,11 @@ export class Parser extends ChevParser {
     () => {
       this.CONSUME(SQ_BRACKET_LEFT)
 
-      this.AT_LEAST_ONE(() => {
-        this.SUBRULE(this.CommandUnit)
+      this.AT_LEAST_ONE({
+        DEF: () => {
+          this.SUBRULE(this.CommandUnit)
+        },
+        GATE: () => this.LA(1).image !== SQ_BRACKET_RIGHT.PATTERN,
       })
 
       this.CONSUME(SQ_BRACKET_RIGHT)
@@ -390,8 +417,11 @@ export class Parser extends ChevParser {
     () => {
       this.CONSUME(SQ_BRACKET_2_LEFT)
 
-      this.AT_LEAST_ONE(() => {
-        this.SUBRULE(this.CommandUnit)
+      this.AT_LEAST_ONE({
+        DEF: () => {
+          this.SUBRULE(this.CommandUnit)
+        },
+        GATE: () => this.LA(1).image !== SQ_BRACKET_2_RIGHT.PATTERN,
       })
 
       this.CONSUME(SQ_BRACKET_2_RIGHT)

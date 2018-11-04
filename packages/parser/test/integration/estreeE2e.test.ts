@@ -216,7 +216,7 @@ grep bar`
   test('simple commands', () => {
     check('.//foo/bar.baz bar')
     check('find .')
-    check('echo {')
+    check('echo } if fi then else elif while function done do [[ ]] [ ] {  }')
     check('echo foo{')
     check('./foo/bar.baz foo')
     check('echo $ FOO')
@@ -383,6 +383,12 @@ grep bar`
   test('while expressions', () => {
     check('while true; do sleep 1; echo foo; done', {
       containingNodes: ['WhileExpression'],
+      containsNumWhere: [
+        {
+          fn: n => n.type === 'Command',
+          num: 3,
+        },
+      ],
     })
   })
 
