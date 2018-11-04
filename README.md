@@ -6,7 +6,7 @@
 Collection of Bash utilities: https://bash-utils.netlify.com
 
 The parser is still under development. However, it is already able to parse all
-the scripts in this repository which the expected results. If you find an
+the scripts in this repository with the expected results. If you find an
 unknown issue, please create an issue or PR with a test (even without fix).
 
 Packages:
